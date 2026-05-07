@@ -1,0 +1,1 @@
+var e=`/CyberPrep/assets/somil-goyal-BBIbmSHn.jpeg`;export{e as t};
