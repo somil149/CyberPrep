@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAppStore } from '@stores/appStore'
 import { getQuestionsByRole } from '@data/questions'
 import { getRoleById } from '@data/roles'
@@ -122,6 +122,13 @@ export default function QuestionBankPage() {
   const [category, setCategory] = useState<QuestionCategory | 'all'>('all')
   const [difficulty, setDifficulty] = useState<Difficulty | 'all'>('all')
   const [search, setSearch] = useState('')
+
+  // Reset filters when role changes
+  useEffect(() => {
+    setCategory('all')
+    setDifficulty('all')
+    setSearch('')
+  }, [selectedRole])
 
   if (!selectedRole) {
     return (
