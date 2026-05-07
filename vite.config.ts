@@ -3,8 +3,11 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 
+// GitHub Pages needs /CyberPrep/ base, Cloudflare Pages needs /
+const base = process.env.VITE_BASE_PATH ?? '/CyberPrep/'
+
 export default defineConfig({
-  base: '/CyberPrep/',
+  base,
   plugins: [
     react(),
     VitePWA({

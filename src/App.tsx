@@ -27,7 +27,7 @@ function PageLoader() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/CyberPrep">
+    <BrowserRouter basename={import.meta.env.VITE_BASE_PATH ?? '/CyberPrep'}>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/roles" element={<RoleSelectionPage />} />

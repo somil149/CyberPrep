@@ -29,7 +29,7 @@ export default function DashboardPage() {
     <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
       {/* Built by banner */}
       <a
-        href="/CyberPrep/about"
+        href="/about"
         className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-cyber-surface border border-cyber-border hover:border-cyber-purple/40 transition-colors group"
       >
         <div className="w-8 h-8 rounded-lg overflow-hidden ring-1 ring-cyber-purple/40 flex-shrink-0">
