@@ -11,6 +11,7 @@ const NAV = [
   { to: '/roadmap', icon: '🗺️', label: 'Roadmap' },
   { to: '/flashcards', icon: '⚡', label: 'Flashcards' },
   { to: '/bookmarks', icon: '🔖', label: 'Bookmarks' },
+  { to: '/about', icon: '👤', label: 'About' },
 ]
 
 const TIER1_IDS = ['cybersecurity', 'devsecops', 'aiml-security', 'agentic-ai', 'agentic-ai-security']

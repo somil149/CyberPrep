@@ -10,6 +10,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/roadmap': 'Learning Roadmap',
   '/flashcards': 'Flashcards',
   '/bookmarks': 'Bookmarks',
+  '/about': 'About',
   '/roles': 'Select Role',
 }
 

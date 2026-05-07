@@ -11,6 +11,7 @@ const AgenticStudioPage = lazy(() => import('@pages/AgenticStudioPage'))
 const RoadmapPage = lazy(() => import('@pages/RoadmapPage'))
 const FlashcardsPage = lazy(() => import('@pages/FlashcardsPage'))
 const BookmarksPage = lazy(() => import('@pages/BookmarksPage'))
+const AboutPage = lazy(() => import('@pages/AboutPage'))
 
 function PageLoader() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="/roadmap" element={<RoadmapPage />} />
             <Route path="/flashcards" element={<FlashcardsPage />} />
             <Route path="/bookmarks" element={<BookmarksPage />} />
+            <Route path="/about" element={<AboutPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/roles" replace />} />
         </Routes>
