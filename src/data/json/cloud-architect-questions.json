@@ -1,0 +1,1562 @@
+[
+  {
+    "id": "ca-001",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "Explain the AWS Shared Responsibility Model and how it changes between IaaS, PaaS, and SaaS.",
+    "answer": "AWS manages security OF the cloud (hardware, networking, hypervisor, managed services). Customers manage security IN the cloud. For IaaS (EC2), customers own OS, runtime, data, IAM. For PaaS (RDS), AWS manages OS/patching, customer owns data and access. For SaaS (WorkMail), AWS manages almost everything, customer manages data and user access.",
+    "explanation": "The boundary shifts with each service model. A common interview mistake is assuming AWS handles patching for EC2 — it does not. Understanding this model is foundational for any cloud security or architecture role.",
+    "followUpQuestions": [
+      "Who is responsible for encrypting data at rest in S3?",
+      "What changes in responsibility when using Lambda vs EC2?"
+    ],
+    "keyConcepts": [
+      "Shared Responsibility Model",
+      "IaaS vs PaaS vs SaaS",
+      "Customer-managed controls"
+    ],
+    "tags": [
+      "AWS",
+      "Security",
+      "Fundamentals"
+    ],
+    "realWorldContext": "In enterprise cloud audits, misunderstanding this model is the #1 cause of compliance gaps."
+  },
+  {
+    "id": "ca-002",
+    "roleId": "cloud-architect",
+    "category": "system-design",
+    "difficulty": "hard",
+    "question": "Design a multi-region active-active architecture on AWS for a fintech application requiring 99.99% SLA.",
+    "answer": "Deploy across 2+ regions using Route 53 latency-based or geolocation routing with health checks. Use Aurora Global Database for sub-second replication with <1s RPO. DynamoDB Global Tables for session/config data. ALB + ECS/EKS in each region. Global Accelerator for static anycast IPs. S3 Cross-Region Replication for assets. Implement circuit breakers to handle regional failover. Use AWS Backup with cross-region copy.",
+    "explanation": "Active-active requires conflict resolution strategies for writes. Aurora Global Database handles this with a primary writer region. The key challenge is data consistency vs availability tradeoff — for fintech, strong consistency is often required which limits true active-active writes.",
+    "followUpQuestions": [
+      "How do you handle split-brain scenarios?",
+      "What is your RTO/RPO strategy?",
+      "How do you test failover without impacting production?"
+    ],
+    "keyConcepts": [
+      "Active-Active",
+      "Aurora Global Database",
+      "Route 53",
+      "Global Accelerator",
+      "RTO/RPO"
+    ],
+    "tags": [
+      "AWS",
+      "Multi-Region",
+      "High Availability",
+      "Fintech"
+    ],
+    "realWorldContext": "Used by major banks and payment processors running on AWS to meet regulatory uptime requirements."
+  },
+  {
+    "id": "ca-003",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Compare AWS Transit Gateway vs VPC Peering vs AWS PrivateLink. When do you use each?",
+    "answer": "VPC Peering: direct 1:1 connection, non-transitive, low latency, no bandwidth limits, free (data transfer costs apply). Use for simple hub-spoke or small mesh. Transit Gateway: hub-and-spoke for 100s of VPCs, transitive routing, supports VPN/Direct Connect attachment, centralized routing tables. Use for large enterprise networks. PrivateLink: expose specific services privately without VPC peering, traffic stays on AWS backbone, ideal for SaaS/service provider patterns.",
+    "explanation": "VPC Peering doesn't scale beyond ~10 VPCs due to management overhead. Transit Gateway adds cost (~$0.05/attachment/hour) but simplifies large networks. PrivateLink is the right choice when you want to expose a service endpoint, not entire VPC access.",
+    "followUpQuestions": [
+      "How do you centralize egress traffic with Transit Gateway?",
+      "What are the bandwidth limits of Transit Gateway?"
+    ],
+    "keyConcepts": [
+      "Transit Gateway",
+      "VPC Peering",
+      "PrivateLink",
+      "Network Architecture"
+    ],
+    "tags": [
+      "AWS",
+      "Networking",
+      "VPC"
+    ],
+    "realWorldContext": "Enterprise AWS environments with 50+ VPCs universally use Transit Gateway for hub-and-spoke connectivity."
+  },
+  {
+    "id": "ca-004",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "expert",
+    "question": "How do you implement a zero-trust network architecture in AWS? Walk through the key components.",
+    "answer": "1) Identity: AWS IAM Identity Center with MFA, attribute-based access control. 2) Device: AWS Verified Access for application-level access without VPN, integrates with device trust providers. 3) Network: VPC security groups as micro-perimeters, no implicit trust between subnets. AWS Network Firewall for east-west inspection. 4) Application: API Gateway with Cognito/Lambda authorizers. 5) Data: KMS encryption, S3 bucket policies, Macie for data classification. 6) Monitoring: CloudTrail, VPC Flow Logs, GuardDuty, Security Hub for continuous verification.",
+    "explanation": "Zero trust in AWS means replacing VPN-based perimeter security with identity-aware proxies and continuous validation. AWS Verified Access (2023) is the native ZTA solution replacing traditional VPN for internal apps.",
+    "followUpQuestions": [
+      "How does AWS Verified Access differ from a traditional VPN?",
+      "How do you handle service-to-service authentication in a zero trust model?"
+    ],
+    "keyConcepts": [
+      "Zero Trust",
+      "AWS Verified Access",
+      "IAM Identity Center",
+      "Network Firewall"
+    ],
+    "tags": [
+      "AWS",
+      "Zero Trust",
+      "Security Architecture"
+    ],
+    "realWorldContext": "Post-pandemic remote work drove enterprises to replace VPNs with AWS Verified Access for zero trust application access."
+  },
+  {
+    "id": "ca-005",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "Explain AWS Service Control Policies (SCPs) and how they differ from IAM policies.",
+    "answer": "SCPs are organization-level guardrails applied to OUs or accounts. They define the maximum permissions available — they don't grant permissions, they restrict them. An SCP denying S3 access means even an IAM admin in that account cannot access S3. IAM policies grant permissions within an account. The effective permission is the intersection of SCPs and IAM policies. SCPs don't affect the management account.",
+    "explanation": "SCPs are the primary tool for enforcing enterprise-wide guardrails like 'no resources outside us-east-1' or 'no disabling CloudTrail'. They're evaluated before IAM policies in the authorization chain.",
+    "followUpQuestions": [
+      "How do you prevent accounts from leaving the organization using SCPs?",
+      "Can SCPs restrict root user actions?"
+    ],
+    "keyConcepts": [
+      "SCPs",
+      "AWS Organizations",
+      "IAM",
+      "Guardrails"
+    ],
+    "tags": [
+      "AWS",
+      "IAM",
+      "Organizations",
+      "Governance"
+    ],
+    "realWorldContext": "Fortune 500 companies use SCPs to enforce data residency, prevent cost overruns, and maintain compliance across hundreds of AWS accounts."
+  },
+  {
+    "id": "ca-006",
+    "roleId": "cloud-architect",
+    "category": "system-design",
+    "difficulty": "hard",
+    "question": "Design a landing zone for a 500-person enterprise migrating to AWS. Cover account structure, networking, security, and governance.",
+    "answer": "Use AWS Control Tower for automated landing zone setup. Account structure: Management account (billing only), Security OU (Log Archive + Audit accounts), Infrastructure OU (Shared Services, Network Hub), Workloads OU (Dev/Staging/Prod per team). Networking: Hub-and-spoke with Transit Gateway, centralized egress via NAT Gateway in Network account, Direct Connect or VPN to on-prem. Security: GuardDuty, Security Hub, Config Rules, CloudTrail all centralized to Log Archive. Governance: SCPs for guardrails, AWS Config for compliance, Cost allocation tags enforced via SCPs.",
+    "explanation": "AWS Control Tower automates much of this but understanding the underlying architecture is critical. The key design decision is account-per-environment vs account-per-team — most enterprises use account-per-environment-per-team for blast radius isolation.",
+    "followUpQuestions": [
+      "How do you handle shared services like Active Directory?",
+      "How do you onboard a new team/application?"
+    ],
+    "keyConcepts": [
+      "AWS Control Tower",
+      "Landing Zone",
+      "AWS Organizations",
+      "Transit Gateway"
+    ],
+    "tags": [
+      "AWS",
+      "Landing Zone",
+      "Enterprise",
+      "Governance"
+    ],
+    "realWorldContext": "AWS Control Tower is the standard approach for enterprise AWS adoption programs at consulting firms like Accenture and Deloitte."
+  },
+  {
+    "id": "ca-007",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How does AWS Aurora differ from RDS MySQL? When would you choose Aurora over RDS?",
+    "answer": "Aurora uses a distributed storage layer with 6-way replication across 3 AZs, auto-scaling storage up to 128TB, and up to 15 read replicas with <10ms replica lag. RDS MySQL uses EBS-backed storage with up to 5 read replicas and higher replica lag. Aurora is 5x faster than RDS MySQL per AWS benchmarks. Choose Aurora for: high-throughput OLTP, need for fast failover (<30s), global database requirements, serverless workloads (Aurora Serverless v2). Choose RDS for: cost sensitivity, specific MySQL/PostgreSQL version requirements, simpler workloads.",
+    "explanation": "Aurora's storage is decoupled from compute — the storage layer is a distributed SSD-backed virtual storage system. This enables instant crash recovery and faster failover compared to RDS.",
+    "followUpQuestions": [
+      "What is Aurora Serverless v2 and when would you use it?",
+      "How does Aurora Global Database achieve cross-region replication?"
+    ],
+    "keyConcepts": [
+      "Aurora",
+      "RDS",
+      "Distributed Storage",
+      "Read Replicas"
+    ],
+    "tags": [
+      "AWS",
+      "Database",
+      "Aurora",
+      "RDS"
+    ],
+    "realWorldContext": "Netflix, Airbnb, and Samsung use Aurora for high-throughput transactional workloads requiring sub-millisecond failover."
+  },
+  {
+    "id": "ca-008",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "Explain the difference between horizontal and vertical scaling in AWS. What are the limits of each?",
+    "answer": "Vertical scaling (scale up): increase instance size (e.g., m5.large to m5.4xlarge). Limited by largest available instance type, requires downtime for EC2, no downtime for RDS Multi-AZ. Horizontal scaling (scale out): add more instances behind a load balancer. Requires stateless application design, session externalization (ElastiCache), and Auto Scaling Groups. Horizontal scaling is theoretically unlimited but requires architectural changes. Vertical has hard limits (largest EC2 is u-24tb1.metal with 24TB RAM).",
+    "explanation": "Most cloud-native architectures prefer horizontal scaling for resilience and cost efficiency. Vertical scaling is simpler but creates single points of failure and has hard limits.",
+    "followUpQuestions": [
+      "How do you handle session state when scaling horizontally?",
+      "What is the difference between Auto Scaling and Elastic Load Balancing?"
+    ],
+    "keyConcepts": [
+      "Horizontal Scaling",
+      "Vertical Scaling",
+      "Auto Scaling",
+      "Stateless Design"
+    ],
+    "tags": [
+      "AWS",
+      "Scalability",
+      "Auto Scaling"
+    ],
+    "realWorldContext": "E-commerce platforms use horizontal scaling with Auto Scaling Groups to handle Black Friday traffic spikes automatically."
+  },
+  {
+    "id": "ca-009",
+    "roleId": "cloud-architect",
+    "category": "scenario",
+    "difficulty": "hard",
+    "question": "Your AWS bill increased by 40% last month. Walk me through how you would investigate and reduce costs.",
+    "answer": "1) AWS Cost Explorer: identify top services by cost, look for anomalies. 2) Cost and Usage Report: granular analysis by account/service/tag. 3) Trusted Advisor: check for idle resources, underutilized instances. 4) Common culprits: EC2 instances running 24/7 (use Reserved Instances or Savings Plans), unattached EBS volumes, NAT Gateway data transfer, S3 storage classes, data transfer costs. 5) Remediation: right-size instances, purchase Savings Plans (up to 66% savings), use S3 Intelligent-Tiering, implement auto-stop for dev environments, review data transfer architecture.",
+    "explanation": "NAT Gateway data transfer is a frequently overlooked cost driver — $0.045/GB adds up quickly. S3 GET requests and cross-AZ data transfer are other common surprises.",
+    "followUpQuestions": [
+      "How do you implement cost allocation across teams?",
+      "What is the difference between Reserved Instances and Savings Plans?"
+    ],
+    "keyConcepts": [
+      "Cost Explorer",
+      "Savings Plans",
+      "Reserved Instances",
+      "FinOps"
+    ],
+    "tags": [
+      "AWS",
+      "FinOps",
+      "Cost Optimization"
+    ],
+    "realWorldContext": "FinOps teams at enterprises routinely find 30-40% waste in AWS bills through right-sizing and commitment-based discounts."
+  },
+  {
+    "id": "ca-010",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement disaster recovery in AWS? Compare the 4 DR strategies.",
+    "answer": "1) Backup & Restore (RTO hours, RPO hours): cheapest, use AWS Backup, S3 cross-region replication. 2) Pilot Light (RTO 10s of minutes): core infrastructure always running in DR region, scale up on failover. 3) Warm Standby (RTO minutes): scaled-down but fully functional copy running in DR region. 4) Multi-Site Active-Active (RTO near-zero): full capacity in both regions, Route 53 routes traffic to both. Cost increases significantly from 1→4. Choose based on RTO/RPO requirements and budget.",
+    "explanation": "Most enterprises use Warm Standby for critical systems — it balances cost and recovery time. Active-Active is reserved for systems where any downtime is unacceptable (payments, trading).",
+    "followUpQuestions": [
+      "How do you test DR without impacting production?",
+      "What AWS services support cross-region replication natively?"
+    ],
+    "keyConcepts": [
+      "Disaster Recovery",
+      "RTO",
+      "RPO",
+      "Pilot Light",
+      "Warm Standby"
+    ],
+    "tags": [
+      "AWS",
+      "Disaster Recovery",
+      "Business Continuity"
+    ],
+    "realWorldContext": "Financial regulators require documented DR plans with tested RTO/RPO — AWS DR strategies map directly to these requirements."
+  },
+  {
+    "id": "ca-011",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "expert",
+    "question": "Design a data lake architecture on AWS for a company ingesting 10TB/day from 50 data sources.",
+    "answer": "Ingestion: Kinesis Data Streams for real-time, AWS Glue/DMS for batch, S3 Transfer Acceleration for large files. Storage: S3 with zone architecture — Raw (Bronze), Processed (Silver), Curated (Gold). Use S3 Intelligent-Tiering for cost optimization. Catalog: AWS Glue Data Catalog as central metadata store. Processing: Glue ETL for batch, Kinesis Data Analytics for streaming, EMR for large-scale Spark jobs. Query: Athena for ad-hoc SQL, Redshift Spectrum for BI workloads. Governance: Lake Formation for fine-grained access control, Macie for PII detection. Monitoring: CloudWatch + Glue job metrics.",
+    "explanation": "The medallion architecture (Bronze/Silver/Gold) is the industry standard for data lakes. Lake Formation is critical for column-level and row-level security in regulated industries.",
+    "followUpQuestions": [
+      "How do you handle schema evolution in a data lake?",
+      "How do you implement data quality checks?"
+    ],
+    "keyConcepts": [
+      "Data Lake",
+      "S3",
+      "Glue",
+      "Lake Formation",
+      "Medallion Architecture"
+    ],
+    "tags": [
+      "AWS",
+      "Data Lake",
+      "Analytics",
+      "S3"
+    ],
+    "realWorldContext": "Enterprises like GE and Pfizer use AWS data lakes to consolidate data from ERP, CRM, IoT, and operational systems."
+  },
+  {
+    "id": "ca-012",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is AWS Well-Architected Framework? Describe each of the 6 pillars.",
+    "answer": "1) Operational Excellence: automate operations, make frequent small changes, anticipate failure. 2) Security: implement strong identity, enable traceability, protect data in transit and at rest, apply security at all layers. 3) Reliability: automatically recover from failure, test recovery procedures, scale horizontally. 4) Performance Efficiency: use advanced technologies, go global in minutes, use serverless architectures. 5) Cost Optimization: adopt consumption model, measure overall efficiency, stop spending on undifferentiated heavy lifting. 6) Sustainability (added 2021): minimize environmental impact, maximize utilization, use managed services.",
+    "explanation": "The Well-Architected Framework is AWS's best practices guide. The Well-Architected Tool in the console lets you review workloads against these pillars and get improvement recommendations.",
+    "followUpQuestions": [
+      "How do you conduct a Well-Architected Review?",
+      "Which pillar is most commonly violated in enterprise workloads?"
+    ],
+    "keyConcepts": [
+      "Well-Architected Framework",
+      "6 Pillars",
+      "Best Practices"
+    ],
+    "tags": [
+      "AWS",
+      "Architecture",
+      "Best Practices"
+    ],
+    "realWorldContext": "AWS partners conduct Well-Architected Reviews as a paid service to help enterprises identify and remediate architectural risks."
+  },
+  {
+    "id": "ca-013",
+    "roleId": "cloud-architect",
+    "category": "system-design",
+    "difficulty": "expert",
+    "question": "Design a serverless event-driven architecture for an e-commerce order processing system handling 100K orders/day with peak spikes of 10x.",
+    "answer": "API Gateway → Lambda (order validation) → SQS FIFO queue (ordering guarantee) → Lambda (order processor) → DynamoDB (orders table with DynamoDB Streams) → EventBridge (order events) → multiple consumers: Lambda (inventory update), Lambda (notification service via SNS/SES), Lambda (analytics via Kinesis Firehose → S3). Use SQS dead-letter queues for failed processing. Lambda concurrency limits managed via reserved concurrency. Step Functions for complex multi-step order workflows. CloudWatch alarms on queue depth for scaling signals.",
+    "explanation": "SQS FIFO ensures order processing sequence. EventBridge decouples downstream consumers — adding a new consumer doesn't require changing the order processor. DLQs prevent message loss on failures.",
+    "followUpQuestions": [
+      "How do you handle idempotency in Lambda order processing?",
+      "How do you implement saga pattern for distributed transactions?"
+    ],
+    "keyConcepts": [
+      "Serverless",
+      "Event-Driven",
+      "SQS",
+      "EventBridge",
+      "Lambda"
+    ],
+    "tags": [
+      "AWS",
+      "Serverless",
+      "Event-Driven",
+      "E-commerce"
+    ],
+    "realWorldContext": "Shopify and Amazon itself use event-driven architectures to decouple order processing from fulfillment, notifications, and analytics."
+  },
+  {
+    "id": "ca-014",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How does Amazon CloudFront work and how do you optimize cache hit ratios?",
+    "answer": "CloudFront is a CDN with 450+ edge locations. Requests are routed to nearest edge. Cache hit: served from edge. Cache miss: origin fetch, cached at edge per TTL. Optimize hit ratio: 1) Normalize query strings and headers (only forward what's needed for cache key). 2) Use Cache Policies to control cache key. 3) Set appropriate TTLs — longer for static assets, shorter for dynamic. 4) Use Origin Shield as additional caching layer. 5) Separate cacheable and non-cacheable content into different behaviors. 6) Use versioned URLs for static assets (cache-busting). Monitor with CloudFront cache statistics.",
+    "explanation": "Cache hit ratio directly impacts origin load and latency. A 90%+ hit ratio means 90% of requests never reach your origin. Origin Shield adds a regional cache layer reducing origin load further.",
+    "followUpQuestions": [
+      "How do you invalidate CloudFront cache?",
+      "How do you serve different content to mobile vs desktop users?"
+    ],
+    "keyConcepts": [
+      "CloudFront",
+      "CDN",
+      "Cache Hit Ratio",
+      "Origin Shield",
+      "Edge Locations"
+    ],
+    "tags": [
+      "AWS",
+      "CloudFront",
+      "CDN",
+      "Performance"
+    ],
+    "realWorldContext": "Media companies use CloudFront to serve video content globally with sub-100ms latency, reducing origin bandwidth costs by 80%+."
+  },
+  {
+    "id": "ca-015",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain AWS IAM roles, policies, and the difference between role assumption and resource-based policies.",
+    "answer": "IAM Role: identity with permissions, assumed by services/users/accounts. No long-term credentials. Identity-based policies: attached to users/roles, define what the principal can do. Resource-based policies: attached to resources (S3 bucket policy, KMS key policy), define who can access the resource. Role assumption (sts:AssumeRole): cross-account access, EC2 instance profiles, Lambda execution roles. Resource-based policies: allow cross-account access without role assumption (S3, SQS, SNS, KMS). Permission boundary: limits maximum permissions a role can have — used to delegate IAM administration safely.",
+    "explanation": "The key distinction: identity-based policies travel with the principal, resource-based policies stay with the resource. For cross-account S3 access, you need both a bucket policy AND the calling role to have S3 permissions.",
+    "followUpQuestions": [
+      "What is the difference between a permission boundary and an SCP?",
+      "How do you implement least privilege at scale?"
+    ],
+    "keyConcepts": [
+      "IAM Roles",
+      "Resource-Based Policies",
+      "STS",
+      "Permission Boundaries"
+    ],
+    "tags": [
+      "AWS",
+      "IAM",
+      "Security",
+      "Access Control"
+    ],
+    "realWorldContext": "Cross-account role assumption is the standard pattern for centralized security tooling accessing workload accounts in AWS Organizations."
+  },
+  {
+    "id": "ca-016",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is AWS Direct Connect and when would you use it over a VPN?",
+    "answer": "Direct Connect: dedicated private network connection from on-premises to AWS, 1Gbps to 100Gbps, consistent latency, not encrypted by default (add MACsec or IPsec VPN over DX for encryption). VPN: encrypted IPsec tunnel over public internet, up to 1.25Gbps per tunnel, variable latency. Use Direct Connect for: high bandwidth (>1Gbps), consistent low latency (trading, real-time), large data transfer (migration), compliance requiring private connectivity. Use VPN for: lower cost, backup connectivity, smaller bandwidth needs, quick setup. Best practice: Direct Connect as primary + VPN as failover.",
+    "explanation": "Direct Connect doesn't provide encryption by default — a common misconception. For regulated industries, you must add encryption. Direct Connect Gateway allows connecting to multiple VPCs/regions from a single DX connection.",
+    "followUpQuestions": [
+      "What is Direct Connect Gateway?",
+      "How do you achieve redundancy with Direct Connect?"
+    ],
+    "keyConcepts": [
+      "Direct Connect",
+      "VPN",
+      "Hybrid Connectivity",
+      "Network Bandwidth"
+    ],
+    "tags": [
+      "AWS",
+      "Networking",
+      "Direct Connect",
+      "Hybrid Cloud"
+    ],
+    "realWorldContext": "Banks and healthcare companies use Direct Connect for HIPAA/PCI compliance requiring private connectivity between on-premises data centers and AWS."
+  },
+  {
+    "id": "ca-017",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement a blue-green deployment on AWS? What are the tradeoffs vs canary deployments?",
+    "answer": "Blue-Green: maintain two identical environments (blue=current, green=new). Switch traffic via Route 53 weighted routing or ALB target group swap. Instant rollback by switching back. Requires 2x infrastructure cost during deployment. Canary: gradually shift traffic percentage (5% → 25% → 100%) using Route 53 weighted routing, ALB weighted target groups, or CodeDeploy. Lower cost, slower rollout, catches issues with real traffic. AWS CodeDeploy supports both natively. For ECS: use CodeDeploy with ALB listener rules. For Lambda: use aliases with weighted routing.",
+    "explanation": "Blue-green is preferred when you need instant rollback capability. Canary is preferred for risk mitigation with gradual exposure. Feature flags (AppConfig) can complement both strategies.",
+    "followUpQuestions": [
+      "How do you handle database schema changes in blue-green deployments?",
+      "How does CodeDeploy integrate with ECS for blue-green?"
+    ],
+    "keyConcepts": [
+      "Blue-Green Deployment",
+      "Canary Deployment",
+      "CodeDeploy",
+      "Zero Downtime"
+    ],
+    "tags": [
+      "AWS",
+      "Deployment",
+      "CodeDeploy",
+      "DevOps"
+    ],
+    "realWorldContext": "Amazon.com deploys thousands of times per day using canary deployments with automated rollback on CloudWatch alarm breaches."
+  },
+  {
+    "id": "ca-018",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "expert",
+    "question": "Design a cost-optimized architecture for a batch ML training workload that runs 4 hours daily.",
+    "answer": "Use EC2 Spot Instances (up to 90% savings) with Spot Fleet or Auto Scaling Group with mixed instance types for availability. SageMaker Training Jobs with Spot (managed spot training with automatic checkpointing). Store checkpoints in S3 to resume interrupted jobs. Use S3 for training data (not EFS — cheaper). Instance selection: GPU instances (p3/p4) for deep learning, c5/m5 for CPU workloads. Schedule with EventBridge + Step Functions. Use Savings Plans for baseline compute. Estimated savings: 70-80% vs on-demand. Add S3 Intelligent-Tiering for training data storage.",
+    "explanation": "Spot interruptions are the main risk — checkpointing to S3 every 5-10 minutes mitigates this. SageMaker managed spot training handles interruption/resume automatically.",
+    "followUpQuestions": [
+      "How do you handle Spot interruption notices?",
+      "When would you use SageMaker vs custom EC2 for ML training?"
+    ],
+    "keyConcepts": [
+      "Spot Instances",
+      "SageMaker",
+      "Cost Optimization",
+      "ML Training"
+    ],
+    "tags": [
+      "AWS",
+      "FinOps",
+      "ML",
+      "Spot Instances"
+    ],
+    "realWorldContext": "Lyft reduced ML training costs by 70% by migrating from on-demand to Spot Instances with checkpointing."
+  },
+  {
+    "id": "ca-019",
+    "roleId": "cloud-architect",
+    "category": "scenario",
+    "difficulty": "expert",
+    "question": "Your application on AWS is experiencing intermittent 5-second latency spikes every 15 minutes. How do you diagnose and fix this?",
+    "answer": "Diagnosis: 1) CloudWatch metrics — check EC2 CPU/memory, RDS CPU/connections, ALB latency percentiles (p99 vs p50). 2) X-Ray traces — identify which service/call is slow. 3) RDS Performance Insights — check for lock waits, slow queries. 4) Check for GC pauses if JVM-based. 5) Check Auto Scaling events — cold starts during scale-out. 6) Check Lambda cold starts if serverless. Common causes: RDS checkpoint/vacuum (PostgreSQL autovacuum), JVM GC, Lambda cold starts, ElastiCache evictions, DNS TTL issues. Fix based on root cause: tune autovacuum, add read replicas, implement connection pooling (RDS Proxy), warm Lambda with scheduled pings.",
+    "explanation": "The 15-minute interval is a strong clue — PostgreSQL autovacuum, scheduled jobs, or Auto Scaling cooldown periods often have regular intervals. X-Ray is the fastest path to root cause in distributed systems.",
+    "followUpQuestions": [
+      "How do you reduce Lambda cold start latency?",
+      "What is RDS Proxy and when should you use it?"
+    ],
+    "keyConcepts": [
+      "Latency Debugging",
+      "X-Ray",
+      "RDS Performance Insights",
+      "CloudWatch"
+    ],
+    "tags": [
+      "AWS",
+      "Performance",
+      "Debugging",
+      "Observability"
+    ],
+    "realWorldContext": "Intermittent latency spikes are one of the most common production issues in AWS — often caused by database maintenance operations."
+  },
+  {
+    "id": "ca-020",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain AWS EKS vs ECS vs Fargate. How do you choose between them?",
+    "answer": "ECS: AWS-native container orchestration, simpler than Kubernetes, tight AWS integration, lower operational overhead. EKS: managed Kubernetes, industry-standard, portable across clouds, larger ecosystem, higher complexity. Fargate: serverless compute for both ECS and EKS — no node management, pay per vCPU/memory per second, slower cold starts, higher per-unit cost. Choose ECS for: AWS-only shops, simpler workloads, teams without Kubernetes expertise. Choose EKS for: Kubernetes expertise, multi-cloud strategy, complex workloads needing K8s ecosystem. Choose Fargate for: variable workloads, no ops team for node management, security isolation per task.",
+    "explanation": "Fargate eliminates node patching and capacity planning but costs 20-30% more than equivalent EC2. For steady-state workloads, EC2 node groups with Karpenter (auto-provisioner) often provide better cost efficiency.",
+    "followUpQuestions": [
+      "How does Karpenter improve EKS node provisioning?",
+      "What is the difference between ECS tasks and services?"
+    ],
+    "keyConcepts": [
+      "EKS",
+      "ECS",
+      "Fargate",
+      "Container Orchestration"
+    ],
+    "tags": [
+      "AWS",
+      "Containers",
+      "Kubernetes",
+      "EKS",
+      "ECS"
+    ],
+    "realWorldContext": "Startups often start with ECS Fargate for simplicity, then migrate to EKS as they scale and need more control."
+  },
+  {
+    "id": "ca-021",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How does AWS Auto Scaling work? Explain the difference between target tracking, step scaling, and scheduled scaling.",
+    "answer": "Target Tracking: maintain a metric at a target value (e.g., CPU at 50%). Simplest, AWS manages scale-in/out automatically. Step Scaling: define scaling adjustments based on alarm breach magnitude (e.g., +2 instances if CPU>70%, +4 if CPU>90%). More control, requires CloudWatch alarms. Scheduled Scaling: scale at specific times (e.g., scale up at 8am, down at 8pm). For predictable patterns. Predictive Scaling: uses ML to forecast load and scale proactively. Best practice: combine target tracking (reactive) with scheduled/predictive (proactive) for optimal performance.",
+    "explanation": "Target tracking is the recommended default — it's self-healing and requires minimal configuration. Step scaling is useful when you need asymmetric scaling behavior based on severity.",
+    "followUpQuestions": [
+      "What is the cooldown period and why does it matter?",
+      "How do you scale based on SQS queue depth?"
+    ],
+    "keyConcepts": [
+      "Auto Scaling",
+      "Target Tracking",
+      "Step Scaling",
+      "Predictive Scaling"
+    ],
+    "tags": [
+      "AWS",
+      "Auto Scaling",
+      "EC2"
+    ],
+    "realWorldContext": "E-commerce platforms combine scheduled scaling (pre-scale for known events) with target tracking (handle unexpected spikes)."
+  },
+  {
+    "id": "ca-022",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is Amazon SQS and how does it differ from SNS and EventBridge?",
+    "answer": "SQS: message queue, pull-based, messages stored until consumed (up to 14 days), supports FIFO ordering, dead-letter queues, visibility timeout for at-least-once delivery. SNS: pub/sub, push-based, fan-out to multiple subscribers (SQS, Lambda, HTTP, email), no message persistence. EventBridge: event bus, rule-based routing, schema registry, supports 200+ AWS services and SaaS integrations, event replay, archive. Use SQS for: decoupling, load leveling, worker queues. Use SNS for: fan-out notifications. Use EventBridge for: complex event routing, cross-account events, SaaS integrations.",
+    "explanation": "SNS+SQS fan-out pattern is common: SNS topic → multiple SQS queues for different consumers. EventBridge is the evolution of CloudWatch Events and is preferred for new event-driven architectures.",
+    "followUpQuestions": [
+      "What is the difference between SQS Standard and FIFO queues?",
+      "How do you implement the outbox pattern with SQS?"
+    ],
+    "keyConcepts": [
+      "SQS",
+      "SNS",
+      "EventBridge",
+      "Messaging Patterns"
+    ],
+    "tags": [
+      "AWS",
+      "Messaging",
+      "Event-Driven"
+    ],
+    "realWorldContext": "Uber uses SQS for trip event processing, ensuring no events are lost even during downstream service outages."
+  },
+  {
+    "id": "ca-023",
+    "roleId": "cloud-architect",
+    "category": "system-design",
+    "difficulty": "expert",
+    "question": "Design a real-time fraud detection system on AWS processing 50,000 transactions per second.",
+    "answer": "Ingestion: API Gateway + Kinesis Data Streams (50K TPS, 24hr retention). Processing: Kinesis Data Analytics (Flink) for real-time feature computation (velocity checks, geo-anomalies, device fingerprinting). ML Inference: SageMaker real-time endpoint with auto-scaling, <10ms p99 latency. Decision: Lambda reads inference result, applies rules engine (DynamoDB for rules), publishes decision to SNS. Storage: DynamoDB for transaction state (hot), S3+Athena for historical analysis (cold). Feedback loop: SageMaker Model Monitor for drift detection, retrain pipeline with Step Functions. Alert: SNS → fraud team notification.",
+    "explanation": "The key challenge is latency — fraud decisions must happen before transaction completes (<100ms). Kinesis + SageMaker real-time endpoint achieves this. Feature store (SageMaker Feature Store) provides consistent features between training and inference.",
+    "followUpQuestions": [
+      "How do you handle model drift in production?",
+      "How do you balance false positive rate vs fraud catch rate?"
+    ],
+    "keyConcepts": [
+      "Kinesis",
+      "SageMaker",
+      "Real-time ML",
+      "Fraud Detection"
+    ],
+    "tags": [
+      "AWS",
+      "ML",
+      "Real-time",
+      "Fraud Detection"
+    ],
+    "realWorldContext": "Capital One and JPMorgan use AWS-based real-time ML pipelines to detect fraud within milliseconds of transaction initiation."
+  },
+  {
+    "id": "ca-024",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain AWS KMS and how you implement envelope encryption.",
+    "answer": "KMS manages Customer Master Keys (CMKs). Envelope encryption: 1) Generate Data Encryption Key (DEK) from CMK using GenerateDataKey API. 2) Encrypt data locally with DEK (plaintext). 3) Store encrypted DEK alongside encrypted data. 4) Discard plaintext DEK. Decryption: call KMS Decrypt with encrypted DEK → get plaintext DEK → decrypt data locally. Benefits: only small DEK is sent to KMS (not large data), reduces KMS API calls and costs, data never leaves your environment unencrypted. KMS key types: AWS managed (free, limited control), Customer managed (more control, $1/month), Customer provided (BYOK).",
+    "explanation": "Envelope encryption is the standard pattern for encrypting large amounts of data with KMS. Sending large data directly to KMS is not supported (4KB limit) and would be slow.",
+    "followUpQuestions": [
+      "What is KMS key rotation and how does it work?",
+      "How do you implement cross-account KMS key access?"
+    ],
+    "keyConcepts": [
+      "KMS",
+      "Envelope Encryption",
+      "DEK",
+      "CMK"
+    ],
+    "tags": [
+      "AWS",
+      "KMS",
+      "Encryption",
+      "Security"
+    ],
+    "realWorldContext": "All AWS managed services (S3, EBS, RDS) use envelope encryption with KMS under the hood."
+  },
+  {
+    "id": "ca-025",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is Amazon DynamoDB and when would you choose it over a relational database?",
+    "answer": "DynamoDB: fully managed NoSQL key-value and document database, single-digit millisecond latency at any scale, serverless with on-demand or provisioned capacity, automatic multi-AZ replication, global tables for multi-region. Choose DynamoDB for: high-throughput low-latency workloads (gaming leaderboards, session stores, IoT), simple access patterns (key-value lookups), unpredictable traffic (on-demand mode), global distribution. Choose RDS for: complex queries with JOINs, ACID transactions across multiple tables, reporting/analytics, existing SQL expertise. DynamoDB supports transactions (TransactWriteItems) but within a single table design.",
+    "explanation": "DynamoDB's single-table design pattern is counterintuitive for SQL developers but enables massive scale. The access pattern must be defined upfront — changing it later requires data migration.",
+    "followUpQuestions": [
+      "What is a DynamoDB partition key and how does it affect performance?",
+      "How do you model a many-to-many relationship in DynamoDB?"
+    ],
+    "keyConcepts": [
+      "DynamoDB",
+      "NoSQL",
+      "Single-Table Design",
+      "Partition Key"
+    ],
+    "tags": [
+      "AWS",
+      "DynamoDB",
+      "Database",
+      "NoSQL"
+    ],
+    "realWorldContext": "Amazon.com's shopping cart, Snapchat's messaging, and Lyft's ride matching all use DynamoDB for high-throughput low-latency access."
+  },
+  {
+    "id": "ca-026",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement a hub-and-spoke network topology in AWS using Transit Gateway?",
+    "answer": "Create Transit Gateway in hub account. Attach all spoke VPCs and on-premises connections (VPN/DX). Create route tables: 1) Spoke route table: routes to 0.0.0.0/0 via TGW (for internet via centralized egress). 2) Hub route table: routes to each spoke CIDR. Enable route propagation for VPN/DX. Centralized egress: NAT Gateway in hub VPC, all spoke traffic routes through hub for internet access. Centralized inspection: AWS Network Firewall or third-party appliance in hub VPC for east-west traffic inspection. Use Resource Access Manager (RAM) to share TGW across accounts.",
+    "explanation": "Centralized egress reduces NAT Gateway costs (one per region vs one per VPC) and simplifies firewall management. The inspection VPC pattern inserts a firewall between all spoke-to-spoke traffic.",
+    "followUpQuestions": [
+      "What is the difference between TGW route tables and VPC route tables?",
+      "How do you implement network segmentation with TGW?"
+    ],
+    "keyConcepts": [
+      "Transit Gateway",
+      "Hub-and-Spoke",
+      "Centralized Egress",
+      "Network Firewall"
+    ],
+    "tags": [
+      "AWS",
+      "Networking",
+      "Transit Gateway",
+      "Enterprise"
+    ],
+    "realWorldContext": "Large enterprises with 100+ VPCs use Transit Gateway hub-and-spoke to reduce network complexity from O(n²) peering to O(n) attachments."
+  },
+  {
+    "id": "ca-027",
+    "roleId": "cloud-architect",
+    "category": "behavioral",
+    "difficulty": "medium",
+    "question": "Describe a time you had to convince stakeholders to adopt a cloud-native architecture over a lift-and-shift approach.",
+    "answer": "Structure with STAR: Situation — legacy monolith migration project with tight timeline. Task — architect team wanted lift-and-shift for speed, I advocated for cloud-native. Action — built TCO analysis showing 40% higher 3-year cost for lift-and-shift, demonstrated auto-scaling benefits with load test simulation, proposed phased approach: lift-and-shift first for speed, then modernize incrementally using strangler fig pattern. Result — stakeholders approved phased approach, first phase delivered on time, modernization reduced operational costs by 35%.",
+    "explanation": "The key is quantifying the business impact. Stakeholders respond to cost, risk, and timeline — not technical elegance. Proposing a phased approach reduces perceived risk.",
+    "followUpQuestions": [
+      "How do you handle resistance from teams comfortable with on-premises?",
+      "How do you measure success of a cloud migration?"
+    ],
+    "keyConcepts": [
+      "Cloud Migration",
+      "Stakeholder Management",
+      "TCO Analysis",
+      "Strangler Fig"
+    ],
+    "tags": [
+      "Behavioral",
+      "Cloud Migration",
+      "Leadership"
+    ],
+    "realWorldContext": "Most enterprise cloud migrations face this tension — speed of lift-and-shift vs long-term benefits of cloud-native design."
+  },
+  {
+    "id": "ca-028",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What is AWS Savings Plans and how do they differ from Reserved Instances?",
+    "answer": "Reserved Instances (RIs): commit to specific instance type, region, OS for 1 or 3 years. Up to 72% savings. Convertible RIs allow changing instance type. Zonal RIs provide capacity reservation. Savings Plans: commit to a dollar amount of compute usage per hour for 1 or 3 years. Compute Savings Plans (most flexible): apply to EC2, Lambda, Fargate across any region/instance type. EC2 Instance Savings Plans: specific instance family in a region, higher discount (up to 72%). Savings Plans are simpler to manage — no need to match specific instance types. Recommendation: use Savings Plans for baseline, Spot for variable, on-demand for spikes.",
+    "explanation": "Savings Plans replaced most RI use cases due to flexibility. The key advantage: a Compute Savings Plan applies automatically to Lambda and Fargate usage, which RIs don't cover.",
+    "followUpQuestions": [
+      "How do you right-size before purchasing Savings Plans?",
+      "What happens to unused Savings Plans commitment?"
+    ],
+    "keyConcepts": [
+      "Savings Plans",
+      "Reserved Instances",
+      "FinOps",
+      "Cost Optimization"
+    ],
+    "tags": [
+      "AWS",
+      "FinOps",
+      "Cost Optimization"
+    ],
+    "realWorldContext": "Enterprises save 40-60% on compute costs by combining Savings Plans (baseline) with Spot Instances (variable workloads)."
+  },
+  {
+    "id": "ca-029",
+    "roleId": "cloud-architect",
+    "category": "system-design",
+    "difficulty": "hard",
+    "question": "Design a CI/CD pipeline on AWS for a microservices application with 20 services.",
+    "answer": "Source: CodeCommit or GitHub. Pipeline: CodePipeline orchestrates stages. Build: CodeBuild — runs unit tests, SAST (Semgrep), builds Docker image, pushes to ECR. Test: deploy to dev environment (EKS dev namespace), run integration tests, DAST scan. Staging: deploy to staging, run smoke tests, performance tests. Production: manual approval gate, blue-green deployment via CodeDeploy + ECS/EKS. Notifications: SNS → Slack/email on failures. Artifact storage: S3 for build artifacts, ECR for container images. Secrets: Secrets Manager injected at runtime. Per-service pipelines with shared CodeBuild projects for common steps.",
+    "explanation": "20 services means 20 independent pipelines — avoid a monolithic pipeline. Shared CodeBuild projects reduce duplication. The manual approval gate before production is critical for regulated environments.",
+    "followUpQuestions": [
+      "How do you handle database migrations in this pipeline?",
+      "How do you implement feature flags to decouple deployment from release?"
+    ],
+    "keyConcepts": [
+      "CodePipeline",
+      "CodeBuild",
+      "CodeDeploy",
+      "CI/CD",
+      "Microservices"
+    ],
+    "tags": [
+      "AWS",
+      "CI/CD",
+      "DevOps",
+      "Microservices"
+    ],
+    "realWorldContext": "AWS's own internal teams use CodePipeline with thousands of microservice pipelines, deploying to production thousands of times per day."
+  },
+  {
+    "id": "ca-030",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "expert",
+    "question": "How do you architect for compliance in AWS (PCI DSS, HIPAA, SOC 2)? What AWS services are in scope?",
+    "answer": "PCI DSS: cardholder data environment (CDE) isolation in dedicated VPC/account, encryption in transit (TLS 1.2+) and at rest (KMS), CloudTrail for audit logging, Config for compliance rules, GuardDuty for threat detection, WAF for web application protection, quarterly vulnerability scans. HIPAA: Business Associate Agreement (BAA) with AWS, PHI encryption, access logging, minimum necessary access (IAM), audit controls. SOC 2: Trust Service Criteria — security, availability, processing integrity, confidentiality, privacy. AWS Artifact provides compliance reports. Use AWS Security Hub for centralized compliance dashboard with CIS benchmarks.",
+    "explanation": "AWS is not automatically compliant — you must configure services correctly. AWS Artifact provides AWS's own compliance certifications. Shared responsibility means you must implement controls on top of AWS's compliant infrastructure.",
+    "followUpQuestions": [
+      "What is the difference between AWS being HIPAA eligible vs HIPAA compliant?",
+      "How do you scope a PCI DSS assessment in AWS?"
+    ],
+    "keyConcepts": [
+      "PCI DSS",
+      "HIPAA",
+      "SOC 2",
+      "Compliance",
+      "AWS Artifact"
+    ],
+    "tags": [
+      "AWS",
+      "Compliance",
+      "Security",
+      "Governance"
+    ],
+    "realWorldContext": "Healthcare and financial services companies must implement specific AWS configurations to meet regulatory requirements — not just use AWS."
+  },
+  {
+    "id": "ca-031",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain Amazon ElastiCache. When do you use Redis vs Memcached?",
+    "answer": "ElastiCache is a managed in-memory caching service. Redis: supports data structures (strings, hashes, lists, sets, sorted sets), persistence (RDB/AOF), replication, clustering, pub/sub, Lua scripting, geospatial. Memcached: simple key-value, multi-threaded, no persistence, no replication, horizontal scaling via sharding. Choose Redis for: session storage, leaderboards (sorted sets), pub/sub messaging, geospatial queries, need for persistence/replication. Choose Memcached for: simple caching, multi-threaded performance, horizontal scaling simplicity. Redis is the default choice for most use cases due to richer feature set.",
+    "explanation": "Redis Cluster mode enables horizontal scaling with automatic sharding. ElastiCache for Redis supports Global Datastore for cross-region replication, useful for multi-region session management.",
+    "followUpQuestions": [
+      "How do you implement cache-aside pattern with ElastiCache?",
+      "What is the difference between write-through and write-behind caching?"
+    ],
+    "keyConcepts": [
+      "ElastiCache",
+      "Redis",
+      "Memcached",
+      "Caching Patterns"
+    ],
+    "tags": [
+      "AWS",
+      "ElastiCache",
+      "Redis",
+      "Caching"
+    ],
+    "realWorldContext": "Twitter uses Redis for timeline caching, Instagram for session storage, and gaming companies for real-time leaderboards."
+  },
+  {
+    "id": "ca-032",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is AWS CloudFormation and how does it compare to Terraform?",
+    "answer": "CloudFormation: AWS-native IaC, JSON/YAML templates, deep AWS integration, free (pay for resources), supports drift detection, StackSets for multi-account deployment, no state file management (AWS manages state). Terraform: multi-cloud, HCL language, larger community/module ecosystem, state file management required (S3+DynamoDB for remote state), plan/apply workflow, supports 1000+ providers. Choose CloudFormation for: AWS-only, tight AWS service integration, no state management overhead. Choose Terraform for: multi-cloud, team familiarity, richer module ecosystem, better plan output. CDK (Cloud Development Kit): write IaC in TypeScript/Python/Java, compiles to CloudFormation.",
+    "explanation": "Most enterprises use Terraform for its multi-cloud support and mature ecosystem. AWS CDK is gaining adoption for teams preferring programming languages over YAML/HCL.",
+    "followUpQuestions": [
+      "How do you manage Terraform state in a team environment?",
+      "What is AWS CDK and how does it relate to CloudFormation?"
+    ],
+    "keyConcepts": [
+      "CloudFormation",
+      "Terraform",
+      "IaC",
+      "CDK"
+    ],
+    "tags": [
+      "AWS",
+      "IaC",
+      "CloudFormation",
+      "Terraform"
+    ],
+    "realWorldContext": "HashiCorp reports Terraform is used by 80%+ of Fortune 500 companies for infrastructure automation."
+  },
+  {
+    "id": "ca-033",
+    "roleId": "cloud-architect",
+    "category": "scenario",
+    "difficulty": "hard",
+    "question": "Your RDS database is at 95% CPU during peak hours. What are your options?",
+    "answer": "Immediate: 1) Add read replicas and redirect read traffic from application. 2) Enable ElastiCache (Redis) for query result caching. 3) Vertical scale (instance type upgrade) — requires brief downtime for non-Multi-AZ. Medium-term: 4) Query optimization — RDS Performance Insights to identify top SQL, add indexes. 5) Connection pooling with RDS Proxy to reduce connection overhead. 6) Partition large tables. Long-term: 7) Migrate to Aurora (better performance). 8) Shard database. 9) Move to DynamoDB for appropriate workloads. 10) Implement CQRS pattern to separate read/write paths.",
+    "explanation": "Read replicas are the fastest relief for read-heavy workloads. Performance Insights is the first diagnostic tool — it shows which queries consume the most CPU. Don't scale vertically without first understanding the root cause.",
+    "followUpQuestions": [
+      "How do you identify slow queries in RDS?",
+      "What is RDS Proxy and how does it help with connection pooling?"
+    ],
+    "keyConcepts": [
+      "RDS",
+      "Read Replicas",
+      "Performance Insights",
+      "ElastiCache"
+    ],
+    "tags": [
+      "AWS",
+      "RDS",
+      "Performance",
+      "Database"
+    ],
+    "realWorldContext": "Database CPU saturation is one of the most common production incidents — read replicas and caching are the standard first response."
+  },
+  {
+    "id": "ca-034",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How does AWS Lambda work under the hood? Explain cold starts and how to mitigate them.",
+    "answer": "Lambda execution model: 1) Cold start: AWS provisions a new execution environment (container), downloads code, initializes runtime, runs init code. Takes 100ms-10s depending on runtime and package size. 2) Warm start: reuses existing execution environment, skips init. Cold start causes: first invocation, after idle period (~15min), scaling out. Mitigation: 1) Provisioned Concurrency: pre-warm N execution environments (eliminates cold starts, costs money). 2) Lambda SnapStart (Java): snapshot initialized environment. 3) Minimize package size (tree shaking, layers). 4) Use lighter runtimes (Node.js/Python faster than Java). 5) Keep Lambda warm with scheduled pings (not recommended for production). 6) Move init code outside handler.",
+    "explanation": "Cold starts matter most for latency-sensitive user-facing APIs. For async/batch workloads, cold starts are irrelevant. Provisioned Concurrency is the definitive solution but adds cost.",
+    "followUpQuestions": [
+      "What is Lambda SnapStart and which runtimes support it?",
+      "How do you size Lambda memory for optimal cost/performance?"
+    ],
+    "keyConcepts": [
+      "Lambda",
+      "Cold Start",
+      "Provisioned Concurrency",
+      "Execution Environment"
+    ],
+    "tags": [
+      "AWS",
+      "Lambda",
+      "Serverless",
+      "Performance"
+    ],
+    "realWorldContext": "Financial services APIs using Lambda require Provisioned Concurrency to meet sub-100ms SLA requirements."
+  },
+  {
+    "id": "ca-035",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "expert",
+    "question": "Design a multi-tenant SaaS architecture on AWS. How do you handle tenant isolation?",
+    "answer": "Isolation models: 1) Silo (account-per-tenant): strongest isolation, highest cost, complex management. Use for enterprise/regulated tenants. 2) Pool (shared infrastructure): most cost-efficient, requires application-level isolation. 3) Bridge (hybrid): silo for large tenants, pool for small. Implementation: tenant context via JWT claims, DynamoDB partition key includes tenantId, S3 bucket prefixes per tenant, IAM roles with tenant-specific conditions (aws:PrincipalTag). Compute: EKS namespaces per tenant or shared pods with tenant context. Networking: VPC per tenant (silo) or shared VPC with security groups. Billing: Cost allocation tags per tenant. Use AWS Control Tower + account vending machine for silo model.",
+    "explanation": "The silo vs pool decision is the fundamental SaaS architecture choice. Most SaaS companies use a tiered approach: free/starter tenants in pool, enterprise tenants in silo.",
+    "followUpQuestions": [
+      "How do you implement tenant-aware logging and monitoring?",
+      "How do you handle tenant data migration?"
+    ],
+    "keyConcepts": [
+      "Multi-Tenant",
+      "SaaS",
+      "Tenant Isolation",
+      "Account Vending"
+    ],
+    "tags": [
+      "AWS",
+      "SaaS",
+      "Multi-Tenant",
+      "Architecture"
+    ],
+    "realWorldContext": "Salesforce, Workday, and ServiceNow all use variations of multi-tenant architecture on AWS to serve thousands of enterprise customers."
+  },
+  {
+    "id": "ca-036",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What is AWS GuardDuty and how does it differ from AWS Security Hub and AWS Inspector?",
+    "answer": "GuardDuty: threat detection service using ML on CloudTrail, VPC Flow Logs, DNS logs, S3 data events. Detects active threats: compromised instances, credential theft, crypto mining, data exfiltration. No agents required. Security Hub: aggregates findings from GuardDuty, Inspector, Macie, IAM Access Analyzer, and third-party tools. Provides compliance dashboards (CIS, PCI DSS). Central security posture management. Inspector: vulnerability assessment for EC2 (agent-based) and ECR container images. Finds CVEs, network exposure, software vulnerabilities. Relationship: Inspector finds vulnerabilities → GuardDuty detects active exploitation → Security Hub aggregates both.",
+    "explanation": "These three services are complementary, not competing. A mature security posture uses all three: Inspector for vulnerability management, GuardDuty for threat detection, Security Hub for centralized visibility.",
+    "followUpQuestions": [
+      "How do you automate remediation of GuardDuty findings?",
+      "What is Amazon Macie and when do you use it?"
+    ],
+    "keyConcepts": [
+      "GuardDuty",
+      "Security Hub",
+      "Inspector",
+      "Threat Detection"
+    ],
+    "tags": [
+      "AWS",
+      "Security",
+      "GuardDuty",
+      "Threat Detection"
+    ],
+    "realWorldContext": "Enterprise security teams use Security Hub as their single pane of glass for AWS security posture across hundreds of accounts."
+  },
+  {
+    "id": "ca-037",
+    "roleId": "cloud-architect",
+    "category": "system-design",
+    "difficulty": "expert",
+    "question": "Design a globally distributed content platform (like Netflix) on AWS serving 100M users.",
+    "answer": "Content storage: S3 with cross-region replication. CDN: CloudFront with 450+ edge locations, Origin Shield for cache optimization. Video processing: MediaConvert for transcoding to multiple formats/resolutions, stored in S3. Metadata: DynamoDB Global Tables for user profiles/watch history (low latency globally). Auth: Cognito with JWT tokens. API: API Gateway + Lambda or EKS behind Global Accelerator. Recommendations: SageMaker for ML-based recommendations, ElastiCache for serving. Streaming: AWS Elemental MediaPackage for adaptive bitrate streaming (HLS/DASH). Analytics: Kinesis → S3 → Athena/Redshift for viewing analytics. Monitoring: CloudWatch, X-Ray, synthetic canaries.",
+    "explanation": "The key insight is separating the content delivery path (CloudFront → S3) from the API path (Global Accelerator → API Gateway). CloudFront handles 99%+ of traffic for cached content.",
+    "followUpQuestions": [
+      "How do you handle content licensing restrictions by geography?",
+      "How do you implement adaptive bitrate streaming?"
+    ],
+    "keyConcepts": [
+      "CloudFront",
+      "MediaConvert",
+      "Global Accelerator",
+      "DynamoDB Global Tables"
+    ],
+    "tags": [
+      "AWS",
+      "Media",
+      "Global Scale",
+      "CDN"
+    ],
+    "realWorldContext": "Netflix runs on AWS and serves 200M+ subscribers globally using CloudFront, S3, and custom streaming infrastructure."
+  },
+  {
+    "id": "ca-038",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is Amazon VPC and explain the key components: subnets, route tables, internet gateways, and NAT gateways.",
+    "answer": "VPC: isolated virtual network in AWS, CIDR block (e.g., 10.0.0.0/16). Subnets: subdivisions of VPC CIDR, tied to one AZ. Public subnet: has route to Internet Gateway. Private subnet: no direct internet route. Route tables: control traffic routing, each subnet associated with one route table. Internet Gateway (IGW): allows public subnet resources to reach internet (bidirectional). NAT Gateway: allows private subnet resources to initiate outbound internet connections (one-way), deployed in public subnet, Elastic IP required. Security Groups: stateful firewall at instance level. NACLs: stateless firewall at subnet level.",
+    "explanation": "The public/private subnet distinction is fundamental. A common mistake: putting databases in public subnets. Best practice: web tier in public, app tier and database in private subnets.",
+    "followUpQuestions": [
+      "What is the difference between security groups and NACLs?",
+      "How many NAT Gateways do you need for high availability?"
+    ],
+    "keyConcepts": [
+      "VPC",
+      "Subnets",
+      "Route Tables",
+      "NAT Gateway",
+      "Internet Gateway"
+    ],
+    "tags": [
+      "AWS",
+      "VPC",
+      "Networking",
+      "Fundamentals"
+    ],
+    "realWorldContext": "Every AWS workload starts with VPC design — getting subnet architecture wrong early creates expensive rework later."
+  },
+  {
+    "id": "ca-039",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement observability in AWS? Describe the three pillars and the AWS services for each.",
+    "answer": "Metrics: CloudWatch Metrics (EC2, RDS, Lambda built-in), custom metrics via CloudWatch API, Container Insights for EKS/ECS, Application Signals for APM. Logs: CloudWatch Logs, Log Insights for querying, S3 for long-term retention, OpenSearch for log analytics. Traces: X-Ray for distributed tracing, service maps, latency analysis, integration with Lambda/API Gateway/ECS. Unified: CloudWatch Application Signals (new) provides SLO-based monitoring. Third-party: Datadog, Grafana, New Relic integrate via CloudWatch APIs. Best practice: structured logging (JSON), correlation IDs across services, SLO-based alerting (not just threshold alerts).",
+    "explanation": "The shift from monitoring (is it up?) to observability (why is it slow?) requires all three pillars. X-Ray service maps are invaluable for debugging microservice latency issues.",
+    "followUpQuestions": [
+      "How do you implement distributed tracing across Lambda functions?",
+      "What is the difference between CloudWatch alarms and CloudWatch Application Signals?"
+    ],
+    "keyConcepts": [
+      "Observability",
+      "CloudWatch",
+      "X-Ray",
+      "Metrics",
+      "Logs",
+      "Traces"
+    ],
+    "tags": [
+      "AWS",
+      "Observability",
+      "CloudWatch",
+      "X-Ray"
+    ],
+    "realWorldContext": "Netflix's chaos engineering practice relies on deep observability to detect and respond to failures before customers notice."
+  },
+  {
+    "id": "ca-040",
+    "roleId": "cloud-architect",
+    "category": "behavioral",
+    "difficulty": "hard",
+    "question": "How do you approach a cloud architecture review for a system you've never seen before?",
+    "answer": "Framework: 1) Understand business context — SLA requirements, compliance needs, team size, budget. 2) Map the architecture — draw data flows, identify all AWS services, external dependencies. 3) Apply Well-Architected Framework — review each pillar systematically. 4) Identify single points of failure — what happens if each component fails? 5) Review security posture — IAM least privilege, encryption, network exposure. 6) Cost analysis — right-sizing, commitment coverage, waste identification. 7) Operational readiness — monitoring, alerting, runbooks, DR testing. 8) Prioritize findings by risk/impact. 9) Present findings with business context, not just technical issues.",
+    "explanation": "The best architects ask business questions first. A technically perfect architecture that doesn't meet business requirements is a failure. Always tie technical findings to business risk.",
+    "followUpQuestions": [
+      "How do you handle disagreement with the team about architectural decisions?",
+      "How do you prioritize which issues to fix first?"
+    ],
+    "keyConcepts": [
+      "Architecture Review",
+      "Well-Architected",
+      "Risk Assessment"
+    ],
+    "tags": [
+      "Behavioral",
+      "Architecture Review",
+      "Leadership"
+    ],
+    "realWorldContext": "AWS Solution Architects conduct Well-Architected Reviews as a structured process for enterprise customers."
+  },
+  {
+    "id": "ca-041",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What is AWS Step Functions and when would you use it over SQS+Lambda?",
+    "answer": "Step Functions: managed workflow orchestration, visual state machine, built-in error handling/retry/timeout, supports parallel execution, human approval steps, up to 1 year execution duration. Use for: complex multi-step workflows, long-running processes, workflows needing audit trail, saga pattern for distributed transactions. SQS+Lambda: simpler, cheaper for high-volume simple pipelines, no built-in state management. Use Step Functions when: workflow has branching logic, needs retry with backoff, requires visibility into execution state, involves human approval. Express Workflows for high-volume short-duration, Standard for long-running auditable workflows.",
+    "explanation": "Step Functions eliminates the need to build custom orchestration logic in Lambda. The visual workflow editor makes complex business processes auditable and debuggable.",
+    "followUpQuestions": [
+      "How do you implement the saga pattern with Step Functions?",
+      "What is the difference between Standard and Express Workflows?"
+    ],
+    "keyConcepts": [
+      "Step Functions",
+      "Workflow Orchestration",
+      "Saga Pattern",
+      "State Machine"
+    ],
+    "tags": [
+      "AWS",
+      "Step Functions",
+      "Serverless",
+      "Orchestration"
+    ],
+    "realWorldContext": "Insurance companies use Step Functions for claims processing workflows with human approval gates and audit requirements."
+  },
+  {
+    "id": "ca-042",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "expert",
+    "question": "How do you architect for data sovereignty and residency requirements in AWS multi-region deployments?",
+    "answer": "Data residency: ensure data never leaves specified regions. Controls: 1) SCPs to deny actions outside approved regions (aws:RequestedRegion condition). 2) S3 bucket policies restricting replication to approved regions only. 3) RDS/DynamoDB deployed only in compliant regions. 4) CloudTrail logs stored in-region. 5) KMS keys region-specific (keys don't leave region). 6) VPC endpoints to keep traffic on AWS backbone. 7) AWS Config rules to detect out-of-region resources. 8) Data classification with Macie to identify sensitive data. GDPR: EU data stays in EU regions. China: separate AWS China regions with different accounts required.",
+    "explanation": "SCPs with aws:RequestedRegion are the strongest control — they prevent any resource creation outside approved regions even by account admins. AWS China is a completely separate partition requiring separate accounts.",
+    "followUpQuestions": [
+      "How do you handle CloudFront edge caching for data residency?",
+      "What AWS regions are available for GDPR compliance?"
+    ],
+    "keyConcepts": [
+      "Data Sovereignty",
+      "Data Residency",
+      "GDPR",
+      "SCPs",
+      "Region Restrictions"
+    ],
+    "tags": [
+      "AWS",
+      "Compliance",
+      "Data Residency",
+      "GDPR"
+    ],
+    "realWorldContext": "European banks must ensure customer data never leaves EU AWS regions to comply with GDPR and local banking regulations."
+  },
+  {
+    "id": "ca-043",
+    "roleId": "cloud-architect",
+    "category": "system-design",
+    "difficulty": "hard",
+    "question": "Design a microservices API gateway pattern on AWS. What are the key responsibilities of the gateway?",
+    "answer": "API Gateway responsibilities: 1) Request routing to backend services. 2) Authentication/authorization (Cognito, Lambda authorizers, IAM). 3) Rate limiting and throttling (per-client, per-API). 4) SSL termination. 5) Request/response transformation. 6) Caching (API Gateway cache). 7) Logging and monitoring (CloudWatch, X-Ray). 8) API versioning. AWS options: Amazon API Gateway (REST/HTTP/WebSocket), ALB (HTTP/HTTPS, simpler), AppSync (GraphQL). For microservices: API Gateway → Lambda or ECS services. Use VPC Link for private backend services. Implement circuit breaker pattern in Lambda for downstream failures.",
+    "explanation": "API Gateway decouples clients from backend services. The Lambda authorizer pattern enables custom auth logic (JWT validation, API key lookup) without modifying backend services.",
+    "followUpQuestions": [
+      "How do you implement circuit breaker pattern with API Gateway?",
+      "When would you use AppSync over API Gateway?"
+    ],
+    "keyConcepts": [
+      "API Gateway",
+      "Microservices",
+      "Rate Limiting",
+      "Lambda Authorizer"
+    ],
+    "tags": [
+      "AWS",
+      "API Gateway",
+      "Microservices",
+      "Architecture"
+    ],
+    "realWorldContext": "Twilio and Stripe use API gateway patterns to expose hundreds of microservices through a unified, versioned API surface."
+  },
+  {
+    "id": "ca-044",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "Explain S3 storage classes and how to optimize costs with S3 Intelligent-Tiering.",
+    "answer": "S3 Standard: frequent access, highest cost. S3 Standard-IA: infrequent access, 40% cheaper, retrieval fee. S3 One Zone-IA: single AZ, 20% cheaper than Standard-IA, less resilient. S3 Glacier Instant Retrieval: archive with millisecond retrieval. S3 Glacier Flexible Retrieval: minutes to hours retrieval, cheapest for archives. S3 Glacier Deep Archive: 12-hour retrieval, lowest cost. S3 Intelligent-Tiering: automatically moves objects between tiers based on access patterns, no retrieval fees, small monitoring fee per object. Best for: unknown or changing access patterns. Lifecycle policies: automate transitions (e.g., move to IA after 30 days, Glacier after 90 days).",
+    "explanation": "Intelligent-Tiering is the recommended default for most workloads — it eliminates the need to predict access patterns. The monitoring fee ($0.0025/1000 objects) is offset by storage savings for objects >128KB.",
+    "followUpQuestions": [
+      "How do S3 lifecycle policies work?",
+      "What is S3 Replication and when do you use it?"
+    ],
+    "keyConcepts": [
+      "S3 Storage Classes",
+      "Intelligent-Tiering",
+      "Lifecycle Policies",
+      "Cost Optimization"
+    ],
+    "tags": [
+      "AWS",
+      "S3",
+      "Storage",
+      "FinOps"
+    ],
+    "realWorldContext": "Media companies save 60-70% on S3 costs by moving old content to Glacier while keeping recent content in Standard."
+  },
+  {
+    "id": "ca-045",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement secrets management in AWS? Compare Secrets Manager vs Parameter Store.",
+    "answer": "AWS Secrets Manager: automatic rotation for RDS/Redshift/DocumentDB/custom, cross-account access, $0.40/secret/month + API call costs. Parameter Store: free tier (standard), SecureString uses KMS, no automatic rotation, hierarchical naming (/app/prod/db-password). Use Secrets Manager for: database credentials needing rotation, cross-account secrets, compliance requirements. Use Parameter Store for: application config, non-sensitive parameters, cost-sensitive workloads. Best practices: never hardcode secrets, use IAM roles for EC2/Lambda to access secrets, enable rotation, audit with CloudTrail. Inject secrets at runtime, not build time.",
+    "explanation": "Automatic rotation is Secrets Manager's key differentiator — it rotates credentials without application downtime by maintaining two valid versions during rotation.",
+    "followUpQuestions": [
+      "How does Secrets Manager rotation work without downtime?",
+      "How do you access secrets from a Lambda function securely?"
+    ],
+    "keyConcepts": [
+      "Secrets Manager",
+      "Parameter Store",
+      "Secret Rotation",
+      "Least Privilege"
+    ],
+    "tags": [
+      "AWS",
+      "Secrets Management",
+      "Security"
+    ],
+    "realWorldContext": "Hardcoded credentials in source code are the #1 cause of AWS account compromises — Secrets Manager with rotation eliminates this risk."
+  },
+  {
+    "id": "ca-046",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "expert",
+    "question": "What is the AWS CDK and how does it improve on raw CloudFormation?",
+    "answer": "CDK (Cloud Development Kit): define AWS infrastructure using TypeScript, Python, Java, C#, Go. Compiles to CloudFormation. Benefits over raw CFN: 1) Programming language constructs (loops, conditions, functions) vs YAML repetition. 2) L2/L3 constructs with sensible defaults (e.g., Bucket construct auto-enables versioning, encryption). 3) Type safety and IDE autocomplete. 4) Reusable constructs as npm/PyPI packages. 5) CDK Pipelines for self-mutating CI/CD. 6) CDK Aspects for policy enforcement across stacks. Drawbacks: additional abstraction layer, CDK version upgrades can change generated CFN. CDK Constructs Library provides 1000+ pre-built constructs.",
+    "explanation": "CDK L3 constructs (patterns) encode entire architectural patterns — e.g., ApplicationLoadBalancedFargateService creates ALB + ECS + IAM roles + security groups in one construct.",
+    "followUpQuestions": [
+      "What is the difference between L1, L2, and L3 CDK constructs?",
+      "How do you test CDK infrastructure code?"
+    ],
+    "keyConcepts": [
+      "CDK",
+      "CloudFormation",
+      "IaC",
+      "Constructs"
+    ],
+    "tags": [
+      "AWS",
+      "CDK",
+      "IaC",
+      "TypeScript"
+    ],
+    "realWorldContext": "AWS itself uses CDK internally and recommends it as the preferred IaC tool for new projects."
+  },
+  {
+    "id": "ca-047",
+    "roleId": "cloud-architect",
+    "category": "scenario",
+    "difficulty": "expert",
+    "question": "You need to migrate a 50TB Oracle database to AWS with less than 4 hours downtime. How do you approach this?",
+    "answer": "Strategy: 1) Assessment: AWS Schema Conversion Tool (SCT) to identify incompatible Oracle features. 2) Target selection: Aurora PostgreSQL (if compatible) or RDS Oracle. 3) Initial load: AWS DMS full-load task to migrate existing data (takes days, no downtime). 4) CDC phase: DMS change data capture replicates ongoing changes from Oracle redo logs. 5) Validation: AWS DMS data validation, application testing against replica. 6) Cutover window: stop writes to source, let CDC catch up (minutes), update connection strings, restart application. 7) Rollback plan: keep source running for 48 hours post-cutover. Key risks: Oracle-specific features (stored procedures, packages) may need rewriting for Aurora PostgreSQL.",
+    "explanation": "DMS CDC is the key to minimizing downtime — it keeps the target in sync continuously so the cutover window is just the time to drain the replication lag.",
+    "followUpQuestions": [
+      "How do you handle Oracle stored procedures when migrating to Aurora PostgreSQL?",
+      "What is the AWS Database Migration Accelerator program?"
+    ],
+    "keyConcepts": [
+      "DMS",
+      "Database Migration",
+      "CDC",
+      "Schema Conversion Tool"
+    ],
+    "tags": [
+      "AWS",
+      "Migration",
+      "Database",
+      "Oracle"
+    ],
+    "realWorldContext": "Enterprise Oracle-to-AWS migrations are a major workload for AWS Professional Services and partners like Accenture."
+  },
+  {
+    "id": "ca-048",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How does Amazon EKS manage the Kubernetes control plane? What are your responsibilities as a cluster operator?",
+    "answer": "EKS manages: Kubernetes API server, etcd, controller manager, scheduler — all in AWS-managed accounts, multi-AZ by default, automatic version upgrades available. Your responsibilities: 1) Worker nodes (EC2 or Fargate) — patching, scaling, instance type selection. 2) Node groups or Karpenter for auto-provisioning. 3) Kubernetes add-ons (CoreDNS, kube-proxy, VPC CNI, EBS CSI driver). 4) RBAC configuration. 5) Network policies. 6) Pod security standards. 7) Cluster version upgrades (control plane + node groups). 8) Monitoring (Container Insights, Prometheus). 9) Cost optimization (right-sizing, Spot nodes). Managed node groups simplify patching but reduce flexibility.",
+    "explanation": "EKS eliminates control plane management but worker node management remains your responsibility. Karpenter (AWS-built node provisioner) is replacing Cluster Autoscaler for better bin-packing and faster scaling.",
+    "followUpQuestions": [
+      "What is Karpenter and how does it differ from Cluster Autoscaler?",
+      "How do you upgrade an EKS cluster with zero downtime?"
+    ],
+    "keyConcepts": [
+      "EKS",
+      "Kubernetes",
+      "Control Plane",
+      "Karpenter",
+      "Node Groups"
+    ],
+    "tags": [
+      "AWS",
+      "EKS",
+      "Kubernetes",
+      "Containers"
+    ],
+    "realWorldContext": "Spotify runs thousands of microservices on EKS, using Karpenter for cost-optimized node provisioning with Spot Instances."
+  },
+  {
+    "id": "ca-049",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is Amazon Route 53 and explain its routing policies.",
+    "answer": "Route 53: AWS DNS service, domain registration, health checks, traffic routing. Routing policies: 1) Simple: single resource, no health checks. 2) Weighted: distribute traffic by percentage (A/B testing, blue-green). 3) Latency: route to lowest-latency region. 4) Failover: active-passive, routes to secondary when primary health check fails. 5) Geolocation: route based on user's geographic location (compliance, localization). 6) Geoproximity: route based on geographic distance, adjustable bias. 7) Multivalue Answer: return multiple healthy records (basic load balancing). 8) IP-based: route based on client IP CIDR. Health checks: monitor endpoints, integrate with CloudWatch alarms.",
+    "explanation": "Latency-based routing is the most common for multi-region active-active. Failover routing is used for DR. Geolocation is used for data residency compliance.",
+    "followUpQuestions": [
+      "How do you implement DNS failover with Route 53?",
+      "What is the difference between geolocation and geoproximity routing?"
+    ],
+    "keyConcepts": [
+      "Route 53",
+      "DNS",
+      "Routing Policies",
+      "Health Checks"
+    ],
+    "tags": [
+      "AWS",
+      "Route 53",
+      "DNS",
+      "Networking"
+    ],
+    "realWorldContext": "Global SaaS companies use Route 53 latency-based routing to automatically direct users to the nearest AWS region."
+  },
+  {
+    "id": "ca-050",
+    "roleId": "cloud-architect",
+    "category": "behavioral",
+    "difficulty": "hard",
+    "question": "How do you handle a situation where a development team wants to use a new AWS service that hasn't been approved by your security team?",
+    "answer": "Process: 1) Understand the use case — why do they want this service, what problem does it solve? 2) Review the service's security posture — encryption, IAM integration, compliance certifications (AWS Artifact). 3) Identify risks — data classification, network exposure, compliance implications. 4) Engage security team with a structured assessment, not just a request. 5) Propose controls — SCPs to limit usage to specific accounts, Config rules for compliance monitoring. 6) Pilot in sandbox account with security monitoring. 7) Document approval decision and controls. 8) Establish a service approval process to prevent future bottlenecks. Never block without a path forward.",
+    "explanation": "Security teams that only say 'no' become bottlenecks. The goal is enabling innovation safely. A structured approval process with clear criteria speeds up future approvals.",
+    "followUpQuestions": [
+      "How do you build a cloud service catalog for your organization?",
+      "How do you balance developer velocity with security controls?"
+    ],
+    "keyConcepts": [
+      "Service Approval",
+      "Security Governance",
+      "Developer Enablement"
+    ],
+    "tags": [
+      "Behavioral",
+      "Governance",
+      "Security",
+      "Leadership"
+    ],
+    "realWorldContext": "Enterprise cloud teams use AWS Service Catalog and SCPs to provide pre-approved service configurations that developers can self-serve."
+  },
+  {
+    "id": "ca-051",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What is AWS Config and how do you use it for compliance automation?",
+    "answer": "AWS Config: records configuration changes to AWS resources, evaluates against Config Rules. Managed rules: 200+ pre-built (e.g., s3-bucket-public-read-prohibited, encrypted-volumes). Custom rules: Lambda-backed for custom logic. Conformance Packs: collections of rules for compliance frameworks (CIS, PCI DSS, HIPAA). Remediation: auto-remediation via SSM Automation documents (e.g., auto-encrypt unencrypted EBS volumes). Aggregator: collect Config data across accounts/regions into central account. Use cases: detect drift from approved configurations, compliance reporting, change history for incident investigation.",
+    "explanation": "Config is detective control — it finds violations after they occur. Combine with SCPs (preventive) for defense in depth. Config aggregator is essential for multi-account compliance visibility.",
+    "followUpQuestions": [
+      "How do you implement auto-remediation with Config?",
+      "What is the difference between Config Rules and Security Hub controls?"
+    ],
+    "keyConcepts": [
+      "AWS Config",
+      "Compliance",
+      "Config Rules",
+      "Conformance Packs"
+    ],
+    "tags": [
+      "AWS",
+      "Config",
+      "Compliance",
+      "Governance"
+    ],
+    "realWorldContext": "Regulated enterprises use Config conformance packs to continuously monitor and report compliance against PCI DSS and HIPAA requirements."
+  },
+  {
+    "id": "ca-052",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "expert",
+    "question": "Design a real-time analytics platform on AWS for a ride-sharing company processing 1M events/minute.",
+    "answer": "Ingestion: Kinesis Data Streams (1M events/min = ~17K/sec, use 17+ shards). Processing: Kinesis Data Analytics (Apache Flink) for real-time aggregations (surge pricing, driver availability, ETA calculations). Hot path: results to ElastiCache Redis for sub-millisecond serving to mobile apps. Warm path: Kinesis Firehose → S3 (Parquet) → Athena for operational queries. Cold path: S3 → Glue ETL → Redshift for BI/reporting. Serving: API Gateway + Lambda reads from Redis/DynamoDB. Monitoring: CloudWatch metrics on Kinesis shard utilization, Flink job health. Schema registry: Glue Schema Registry for event schema evolution.",
+    "explanation": "The lambda architecture (hot/warm/cold paths) handles different latency requirements. Redis serves real-time surge pricing in <1ms. Redshift handles complex analytical queries over historical data.",
+    "followUpQuestions": [
+      "How do you handle Kinesis shard hot partitions?",
+      "How do you implement exactly-once processing in Kinesis?"
+    ],
+    "keyConcepts": [
+      "Kinesis",
+      "Flink",
+      "Lambda Architecture",
+      "Real-time Analytics"
+    ],
+    "tags": [
+      "AWS",
+      "Analytics",
+      "Kinesis",
+      "Real-time"
+    ],
+    "realWorldContext": "Uber and Lyft use similar architectures for real-time surge pricing, driver matching, and operational dashboards."
+  },
+  {
+    "id": "ca-053",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement cross-account access in AWS? What are the security best practices?",
+    "answer": "Methods: 1) IAM Role assumption (sts:AssumeRole): create role in target account with trust policy allowing source account/role. Source assumes role via STS. Most common pattern. 2) Resource-based policies: S3 bucket policy, KMS key policy granting cross-account access without role assumption. 3) AWS RAM (Resource Access Manager): share resources (Transit Gateway, subnets, Route 53 resolver rules) across accounts. Security best practices: 1) Use external ID for third-party role assumption (confused deputy prevention). 2) Limit trust to specific roles, not entire accounts. 3) Use permission boundaries on assumed roles. 4) Enable CloudTrail in all accounts. 5) Use AWS Organizations SCPs as guardrails. 6) Audit cross-account roles regularly.",
+    "explanation": "The confused deputy problem occurs when a third party can trick your service into using its permissions on their behalf. External ID prevents this by requiring a secret known only to you and the third party.",
+    "followUpQuestions": [
+      "What is the confused deputy problem and how does external ID solve it?",
+      "How do you audit cross-account role usage?"
+    ],
+    "keyConcepts": [
+      "Cross-Account Access",
+      "Role Assumption",
+      "STS",
+      "External ID"
+    ],
+    "tags": [
+      "AWS",
+      "IAM",
+      "Cross-Account",
+      "Security"
+    ],
+    "realWorldContext": "Security tooling vendors (Datadog, Splunk) use cross-account role assumption with external ID to access customer AWS accounts for monitoring."
+  },
+  {
+    "id": "ca-054",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is Amazon Redshift and when would you use it over Athena?",
+    "answer": "Redshift: managed data warehouse, columnar storage, MPP (massively parallel processing), up to 16PB, supports complex SQL, materialized views, ML (Redshift ML). Best for: complex analytical queries, BI tools (Tableau, QuickSight), frequent queries on same data, sub-second query performance. Athena: serverless SQL on S3, pay per query ($5/TB scanned), no infrastructure, supports Parquet/ORC/JSON. Best for: ad-hoc queries, infrequent analysis, data lake queries, cost-sensitive workloads. Redshift Spectrum: query S3 data from Redshift (combines both). Choose Redshift for: regular BI workloads, complex joins, performance SLAs. Choose Athena for: ad-hoc exploration, cost optimization, simple queries.",
+    "explanation": "Athena's pay-per-query model is cost-effective for infrequent queries but expensive for frequent BI workloads. Redshift's reserved pricing becomes cheaper at scale with regular usage.",
+    "followUpQuestions": [
+      "What is Redshift Serverless and when would you use it?",
+      "How do you optimize Athena query costs?"
+    ],
+    "keyConcepts": [
+      "Redshift",
+      "Athena",
+      "Data Warehouse",
+      "Analytics"
+    ],
+    "tags": [
+      "AWS",
+      "Redshift",
+      "Athena",
+      "Analytics"
+    ],
+    "realWorldContext": "Enterprises use Redshift for daily BI reporting and Athena for ad-hoc data science exploration of the same S3 data lake."
+  },
+  {
+    "id": "ca-055",
+    "roleId": "cloud-architect",
+    "category": "system-design",
+    "difficulty": "expert",
+    "question": "Design a secure, scalable API for a healthcare application handling PHI on AWS.",
+    "answer": "Compliance: HIPAA BAA with AWS, PHI encryption at rest (KMS CMK) and in transit (TLS 1.2+). Architecture: Route 53 → CloudFront (WAF, DDoS protection) → API Gateway (throttling, auth) → Lambda/ECS (application) → RDS Aurora (encrypted, Multi-AZ, no public access) → S3 (encrypted, versioned, no public access). Auth: Cognito with MFA for patient-facing, IAM for service-to-service. Audit: CloudTrail for all API calls, VPC Flow Logs, application-level audit log to CloudWatch Logs → S3 (7-year retention). Access control: attribute-based (patient can only access own records). Monitoring: GuardDuty, Security Hub, Macie for PHI detection in S3. No PHI in logs — use patient IDs only.",
+    "explanation": "HIPAA requires audit controls, access controls, transmission security, and integrity controls. AWS provides the infrastructure but you must implement application-level controls.",
+    "followUpQuestions": [
+      "How do you implement break-glass access for emergency PHI access?",
+      "How do you handle PHI in Lambda environment variables?"
+    ],
+    "keyConcepts": [
+      "HIPAA",
+      "PHI",
+      "Healthcare",
+      "Compliance",
+      "Encryption"
+    ],
+    "tags": [
+      "AWS",
+      "HIPAA",
+      "Healthcare",
+      "Security",
+      "Compliance"
+    ],
+    "realWorldContext": "Epic, Cerner, and telehealth startups use AWS with HIPAA BAA for PHI storage and processing."
+  },
+  {
+    "id": "ca-056",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain AWS Fargate networking. How does it differ from EC2-based ECS networking?",
+    "answer": "Fargate networking: each task gets its own elastic network interface (ENI) injected into your VPC — awsvpc network mode. Task has its own private IP, security groups applied at task level (not host level). No host networking, no port conflicts between tasks. EC2 ECS networking modes: bridge (Docker NAT, port mapping), host (shares EC2 host network), awsvpc (same as Fargate, ENI per task). Fargate advantages: task-level security groups, no port conflict management, better network isolation. Limitations: ENI limits per subnet (use /24 or larger subnets), higher ENI density requires subnet planning. Fargate tasks can use VPC endpoints for private AWS service access.",
+    "explanation": "awsvpc mode is the recommended networking mode for both Fargate and EC2 ECS — it provides the best security isolation. The ENI limit per subnet is a common scaling bottleneck to plan for.",
+    "followUpQuestions": [
+      "How do you handle ENI limits when scaling Fargate tasks?",
+      "How do Fargate tasks access AWS services without internet access?"
+    ],
+    "keyConcepts": [
+      "Fargate",
+      "awsvpc",
+      "ENI",
+      "Container Networking"
+    ],
+    "tags": [
+      "AWS",
+      "Fargate",
+      "ECS",
+      "Networking"
+    ],
+    "realWorldContext": "Security-conscious enterprises prefer Fargate's task-level security groups over EC2 bridge networking for container isolation."
+  },
+  {
+    "id": "ca-057",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What is AWS Lake Formation and how does it improve on raw S3 + Glue security?",
+    "answer": "Lake Formation: centralized data lake governance layer on top of S3 + Glue. Provides: 1) Column-level and row-level security (not possible with S3 bucket policies alone). 2) Tag-based access control (LF-Tags) for attribute-based access. 3) Cross-account data sharing without copying data. 4) Data filters for row-level security in Athena/Redshift Spectrum/EMR. 5) Centralized audit logging of data access. 6) Governed Tables with ACID transactions and automatic compaction. Without Lake Formation: S3 bucket policies only provide object-level access, no column/row filtering. Lake Formation sits between query engines and S3, enforcing fine-grained access.",
+    "explanation": "Column-level security is critical for GDPR/HIPAA — you can expose a table to analysts while hiding PII columns. Row-level security enables multi-tenant data lakes where each tenant only sees their data.",
+    "followUpQuestions": [
+      "How do you implement row-level security in Lake Formation?",
+      "How does Lake Formation cross-account sharing work?"
+    ],
+    "keyConcepts": [
+      "Lake Formation",
+      "Column-Level Security",
+      "Row-Level Security",
+      "Data Governance"
+    ],
+    "tags": [
+      "AWS",
+      "Lake Formation",
+      "Data Governance",
+      "Security"
+    ],
+    "realWorldContext": "Healthcare and financial services companies use Lake Formation to share data lake access with analysts while enforcing HIPAA/PCI column-level restrictions."
+  },
+  {
+    "id": "ca-058",
+    "roleId": "cloud-architect",
+    "category": "scenario",
+    "difficulty": "expert",
+    "question": "A critical Lambda function is hitting the 15-minute timeout processing large files. How do you redesign it?",
+    "answer": "Options: 1) Chunking: split large file into chunks using S3 multipart, process each chunk in separate Lambda invocation via SQS. 2) Step Functions: orchestrate multi-step processing with state between steps, no timeout limit on workflow. 3) ECS Fargate task: no timeout limit, triggered by Lambda or EventBridge, suitable for long-running processing. 4) AWS Batch: managed batch computing for large-scale file processing, handles job queuing and retries. 5) Optimize Lambda: stream processing instead of loading entire file into memory, use S3 Select to filter data before processing. Best approach: S3 event → SQS → Lambda (chunked processing) for most cases. Use Fargate/Batch for truly long-running jobs.",
+    "explanation": "Lambda's 15-minute limit is a design constraint, not a bug. It forces decomposition into smaller units. The chunking pattern with SQS enables parallel processing and automatic retries.",
+    "followUpQuestions": [
+      "How do you implement checkpointing for resumable file processing?",
+      "When would you choose AWS Batch over Fargate for batch processing?"
+    ],
+    "keyConcepts": [
+      "Lambda Timeout",
+      "Chunking",
+      "Step Functions",
+      "AWS Batch"
+    ],
+    "tags": [
+      "AWS",
+      "Lambda",
+      "Architecture",
+      "Batch Processing"
+    ],
+    "realWorldContext": "Data processing pipelines commonly hit Lambda timeouts when processing large CSV/Parquet files — chunking is the standard solution."
+  },
+  {
+    "id": "ca-059",
+    "roleId": "cloud-architect",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement GitOps for infrastructure on AWS?",
+    "answer": "GitOps: Git as single source of truth for infrastructure state, automated reconciliation. Tools: Flux or ArgoCD for Kubernetes (EKS), Terraform Cloud/Atlantis for Terraform, AWS CodePipeline for CloudFormation/CDK. Pattern: 1) Infrastructure code in Git. 2) PR triggers plan/preview (Atlantis for Terraform, CDK diff). 3) Merge to main triggers apply via CI/CD. 4) Drift detection: Config rules or Terraform Cloud detects out-of-band changes. 5) Rollback: revert Git commit, pipeline re-applies. For EKS: ArgoCD watches Git repo, syncs Kubernetes manifests automatically. Benefits: audit trail in Git, peer review for infra changes, automated rollback.",
+    "explanation": "GitOps eliminates manual console changes — all infrastructure changes go through Git PRs. This provides audit trail, peer review, and automated rollback capabilities.",
+    "followUpQuestions": [
+      "How do you handle secrets in GitOps workflows?",
+      "How do you implement progressive delivery with GitOps?"
+    ],
+    "keyConcepts": [
+      "GitOps",
+      "ArgoCD",
+      "Flux",
+      "Terraform",
+      "Infrastructure as Code"
+    ],
+    "tags": [
+      "AWS",
+      "GitOps",
+      "DevOps",
+      "IaC"
+    ],
+    "realWorldContext": "Weaveworks (creators of Flux) and major cloud-native companies use GitOps as the standard for Kubernetes infrastructure management."
+  },
+  {
+    "id": "ca-060",
+    "roleId": "cloud-architect",
+    "category": "behavioral",
+    "difficulty": "expert",
+    "question": "You are the lead architect for a $50M cloud transformation program. How do you structure the first 90 days?",
+    "answer": "Days 1-30 (Discover): stakeholder interviews (CTO, CISO, CFO, engineering leads), current state assessment (application portfolio, dependencies, technical debt), cloud readiness assessment, define success metrics (cost, velocity, reliability). Days 31-60 (Design): cloud strategy (lift-and-shift vs modernize vs rebuild), landing zone design, security and compliance framework, migration wave planning, team upskilling plan, governance model. Days 61-90 (Pilot): deploy landing zone, migrate 2-3 low-risk applications as proof of concept, establish CI/CD pipelines, validate security controls, refine migration playbook. Deliverables: cloud strategy document, migration roadmap, TCO analysis, risk register.",
+    "explanation": "The first 90 days are about building trust and proving value with quick wins, not boiling the ocean. The pilot applications should be chosen to demonstrate value while managing risk.",
+    "followUpQuestions": [
+      "How do you handle organizational resistance to cloud transformation?",
+      "How do you measure ROI of a cloud transformation program?"
+    ],
+    "keyConcepts": [
+      "Cloud Transformation",
+      "Program Management",
+      "Landing Zone",
+      "Migration Strategy"
+    ],
+    "tags": [
+      "Behavioral",
+      "Leadership",
+      "Cloud Migration",
+      "Strategy"
+    ],
+    "realWorldContext": "AWS Professional Services and major consulting firms follow a similar 90-day framework for enterprise cloud transformation engagements."
+  }
+]

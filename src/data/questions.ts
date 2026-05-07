@@ -1,6 +1,28 @@
 import type { Question } from '@models/index'
+import cloudQuestions from './json/cloud-architect-questions.json'
+import fullstackQuestions from './json/fullstack-questions.json'
+import datamlQuestions from './json/data-ml-platform-questions.json'
+import leadershipQuestions from './json/leadership-behavioral-questions.json'
+import cybersecurityQuestions from './json/cybersecurity-questions.json'
+import devsecopsQuestions from './json/devsecops-questions.json'
+import aimlSecurityQuestions from './json/aiml-security-questions.json'
+import agenticAiQuestions from './json/agentic-ai-questions.json'
+import agenticAiSecurityQuestions from './json/agentic-ai-security-questions.json'
+
+const jsonQuestions: Question[] = [
+  ...(cybersecurityQuestions as unknown as Question[]),
+  ...(devsecopsQuestions as unknown as Question[]),
+  ...(aimlSecurityQuestions as unknown as Question[]),
+  ...(agenticAiQuestions as unknown as Question[]),
+  ...(agenticAiSecurityQuestions as unknown as Question[]),
+  ...(cloudQuestions as unknown as Question[]),
+  ...(fullstackQuestions as unknown as Question[]),
+  ...(datamlQuestions as unknown as Question[]),
+  ...(leadershipQuestions as unknown as Question[]),
+]
 
 export const QUESTIONS: Question[] = [
+  ...jsonQuestions,
   // ── CYBERSECURITY ────────────────────────────────────────────────────────
   {
     id: 'cs-001', roleId: 'cybersecurity', category: 'technical', difficulty: 'hard',

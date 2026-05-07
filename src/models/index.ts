@@ -36,8 +36,15 @@ export interface Question {
   category: QuestionCategory
   difficulty: Difficulty
   question: string
+  // legacy fields
   hints?: string[]
   sampleAnswer?: string
+  // rich fields from JSON datasets
+  answer?: string
+  explanation?: string
+  followUpQuestions?: string[]
+  keyConcepts?: string[]
+  realWorldContext?: string
   tags: string[]
 }
 

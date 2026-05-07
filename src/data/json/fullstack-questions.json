@@ -1,0 +1,909 @@
+[
+  {
+    "id": "fs-001",
+    "roleId": "fullstack",
+    "category": "system-design",
+    "difficulty": "hard",
+    "question": "Design a real-time collaborative document editing system like Google Docs. How do you handle concurrent edits?",
+    "answer": "Use Operational Transformation (OT) or CRDTs (Conflict-free Replicated Data Types). Architecture: WebSocket server (Socket.io/native WS) for real-time sync, Redis pub/sub for multi-server broadcasting, PostgreSQL for persistence. Each edit is an operation (insert/delete at position). OT transforms concurrent operations to maintain consistency. CRDTs (e.g., Yjs, Automerge) are simpler to implement and work offline. Store document as sequence of operations for history/undo.",
+    "explanation": "CRDTs are now preferred over OT — libraries like Yjs handle the complexity. The key insight is that last-write-wins is wrong for collaborative editing; you need merge semantics.",
+    "followUpQuestions": [
+      "How do you implement cursor presence (showing other users' cursors)?",
+      "How do you handle offline editing and sync on reconnect?"
+    ],
+    "keyConcepts": [
+      "CRDT",
+      "Operational Transformation",
+      "WebSockets",
+      "Real-time Sync"
+    ],
+    "tags": [
+      "System Design",
+      "Real-time",
+      "Collaboration"
+    ],
+    "realWorldContext": "Google Docs uses OT, Notion uses CRDTs. Figma uses a custom CRDT for multiplayer design editing."
+  },
+  {
+    "id": "fs-002",
+    "roleId": "fullstack",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "Explain the difference between REST, GraphQL, and tRPC. When would you choose each?",
+    "answer": "REST: resource-based URLs, HTTP verbs, stateless, widely understood, over/under-fetching issues. GraphQL: single endpoint, client specifies exact data shape, eliminates over/under-fetching, strong typing, N+1 query problem requires DataLoader. tRPC: TypeScript-first RPC, end-to-end type safety without code generation, ideal for TypeScript monorepos. Choose REST for: public APIs, non-TypeScript clients, simplicity. GraphQL for: complex data graphs, mobile apps needing bandwidth efficiency. tRPC for: full-stack TypeScript apps, internal APIs.",
+    "explanation": "tRPC is gaining adoption in Next.js/T3 stack because it eliminates the API contract maintenance overhead. GraphQL's complexity is often overkill for simple CRUD APIs.",
+    "followUpQuestions": [
+      "How do you solve the N+1 problem in GraphQL?",
+      "How does tRPC achieve type safety without code generation?"
+    ],
+    "keyConcepts": [
+      "REST",
+      "GraphQL",
+      "tRPC",
+      "API Design"
+    ],
+    "tags": [
+      "API",
+      "TypeScript",
+      "GraphQL"
+    ],
+    "realWorldContext": "GitHub uses GraphQL for their public API. Vercel uses tRPC internally for their dashboard."
+  },
+  {
+    "id": "fs-003",
+    "roleId": "fullstack",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How does React's reconciliation algorithm work? What are the rules for efficient rendering?",
+    "answer": "React's reconciler (Fiber) diffs the virtual DOM tree. Rules: 1) Elements of different types produce different trees (full remount). 2) Keys identify elements across renders — stable keys prevent unnecessary remounts. 3) React bails out of re-rendering if props/state unchanged (with React.memo, useMemo, useCallback). Fiber enables incremental rendering — work can be paused, resumed, or aborted. Concurrent Mode (React 18) uses priority lanes to schedule renders. Common mistakes: using array index as key, creating components inside render (new reference each render).",
+    "explanation": "The key insight: React doesn't diff the real DOM — it diffs the virtual DOM tree and batches real DOM updates. Keys are the most impactful optimization for list rendering.",
+    "followUpQuestions": [
+      "What is React Fiber and how does it differ from the old stack reconciler?",
+      "When would you use useTransition vs useDeferredValue?"
+    ],
+    "keyConcepts": [
+      "Reconciliation",
+      "Virtual DOM",
+      "Fiber",
+      "Keys",
+      "Concurrent Mode"
+    ],
+    "tags": [
+      "React",
+      "Performance",
+      "Rendering"
+    ],
+    "realWorldContext": "Facebook's news feed uses React Concurrent Mode to keep the UI responsive while loading thousands of posts."
+  },
+  {
+    "id": "fs-004",
+    "roleId": "fullstack",
+    "category": "system-design",
+    "difficulty": "expert",
+    "question": "Design a URL shortener like bit.ly handling 100M URLs and 10B redirects/month.",
+    "answer": "Write path: API → generate short code (base62 of auto-increment ID or hash) → store in DynamoDB (shortCode → longURL, metadata). Read path (hot): Route 53 → CloudFront (cache redirects at edge, TTL 24h) → API Gateway → Lambda → DynamoDB. Cache hit ratio target: 99%+ (most clicks on recently created URLs). Analytics: async via Kinesis → S3 → Athena. Custom domains: Route 53 + ACM. Rate limiting: API Gateway throttling + Redis counter. Scale: 10B redirects/month = ~3,800/sec, CloudFront handles this trivially.",
+    "explanation": "The key insight: 99% of traffic is reads (redirects), not writes. CloudFront caching at edge eliminates most origin hits. DynamoDB's single-digit ms latency handles the remaining cache misses.",
+    "followUpQuestions": [
+      "How do you handle custom aliases (vanity URLs)?",
+      "How do you detect and prevent abuse (spam URLs)?"
+    ],
+    "keyConcepts": [
+      "URL Shortener",
+      "Base62",
+      "DynamoDB",
+      "CloudFront",
+      "Caching"
+    ],
+    "tags": [
+      "System Design",
+      "Scalability",
+      "Caching"
+    ],
+    "realWorldContext": "Bitly processes 10B+ clicks/month. TinyURL serves 600M+ URLs. Both rely heavily on CDN caching for redirect performance."
+  },
+  {
+    "id": "fs-005",
+    "roleId": "fullstack",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is the difference between SSR, SSG, ISR, and CSR in Next.js? When do you use each?",
+    "answer": "CSR: HTML shell, JS fetches data client-side. Slow initial load, good for dashboards behind auth. SSR (getServerSideProps): HTML generated per request on server. Fresh data, slower TTFB, good for personalized pages. SSG (getStaticProps): HTML pre-built at build time. Fastest, CDN-cacheable, good for blogs/marketing. ISR (revalidate): SSG with background regeneration after N seconds. Best of both — static speed with fresh data. Next.js 13+ App Router: Server Components by default, streaming with Suspense.",
+    "explanation": "ISR is the sweet spot for most content sites — static performance with acceptable data freshness. The App Router's Server Components blur the SSR/CSR boundary by streaming components independently.",
+    "followUpQuestions": [
+      "How does Next.js App Router differ from Pages Router?",
+      "What are React Server Components and how do they differ from SSR?"
+    ],
+    "keyConcepts": [
+      "SSR",
+      "SSG",
+      "ISR",
+      "CSR",
+      "Next.js"
+    ],
+    "tags": [
+      "Next.js",
+      "React",
+      "Performance",
+      "Rendering"
+    ],
+    "realWorldContext": "Vercel recommends ISR for e-commerce product pages — static speed with inventory updates every 60 seconds."
+  },
+  {
+    "id": "fs-006",
+    "roleId": "fullstack",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement authentication in a full-stack app? Compare JWT vs session-based auth.",
+    "answer": "Sessions: server stores session state (Redis), client stores session ID in httpOnly cookie. Stateful — easy to revoke, scales with Redis. JWT: server issues signed token, client stores it (httpOnly cookie preferred over localStorage). Stateless — no server storage, hard to revoke before expiry. Use short expiry (15min) + refresh tokens. Best practice: httpOnly + Secure + SameSite=Strict cookies for both. Never store tokens in localStorage (XSS vulnerable). For Next.js: NextAuth.js/Auth.js handles both patterns. For APIs: JWT with refresh token rotation.",
+    "explanation": "The JWT vs session debate is often moot — both work well. The real mistake is storing JWTs in localStorage. httpOnly cookies prevent XSS token theft regardless of auth mechanism.",
+    "followUpQuestions": [
+      "How do you implement refresh token rotation?",
+      "How do you handle auth in a microservices architecture?"
+    ],
+    "keyConcepts": [
+      "JWT",
+      "Sessions",
+      "httpOnly Cookies",
+      "Refresh Tokens",
+      "Auth"
+    ],
+    "tags": [
+      "Authentication",
+      "Security",
+      "JWT"
+    ],
+    "realWorldContext": "Auth0 and Clerk use JWT with refresh token rotation. GitHub uses session-based auth for their web app."
+  },
+  {
+    "id": "fs-007",
+    "roleId": "fullstack",
+    "category": "system-design",
+    "difficulty": "hard",
+    "question": "Design a notification system that supports email, SMS, push, and in-app notifications at scale.",
+    "answer": "Producer: services publish notification events to SQS/Kafka with type, recipient, template, data. Router: Lambda/service reads events, determines channels based on user preferences (stored in DynamoDB). Channel workers: Email (SES/SendGrid), SMS (SNS/Twilio), Push (FCM/APNs via SNS), In-app (WebSocket/SSE + DynamoDB). Template engine: Handlebars/Mustache with templates in S3. Rate limiting: per-user per-channel limits in Redis. Retry: DLQ for failed deliveries. Preferences: user opt-in/out per channel per notification type. Analytics: delivery tracking, open rates.",
+    "explanation": "Decoupling notification routing from delivery via a queue enables independent scaling of each channel. User preferences must be checked before sending to avoid spam and respect opt-outs.",
+    "followUpQuestions": [
+      "How do you handle notification deduplication?",
+      "How do you implement notification batching (digest emails)?"
+    ],
+    "keyConcepts": [
+      "Notification System",
+      "SQS",
+      "Multi-channel",
+      "Rate Limiting"
+    ],
+    "tags": [
+      "System Design",
+      "Notifications",
+      "Scalability"
+    ],
+    "realWorldContext": "Airbnb's notification platform sends 1B+ notifications/month across email, SMS, push, and in-app channels."
+  },
+  {
+    "id": "fs-008",
+    "roleId": "fullstack",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "Explain React's useEffect hook. What are common mistakes and how do you avoid them?",
+    "answer": "useEffect runs after render, optionally with cleanup. Dependency array controls when it runs: [] = once on mount, [dep] = when dep changes, no array = every render. Common mistakes: 1) Missing dependencies (stale closure) — use ESLint exhaustive-deps rule. 2) Infinite loops — object/function dependencies recreated each render, use useMemo/useCallback. 3) Race conditions in async effects — use cleanup flag or AbortController. 4) Overusing effects — prefer event handlers for user interactions, derived state for computed values. React 18 StrictMode runs effects twice in dev to detect side effects.",
+    "explanation": "The mental model shift: useEffect is for synchronizing with external systems, not for reacting to state changes. Most useEffect misuse comes from thinking of it as componentDidMount/Update.",
+    "followUpQuestions": [
+      "When would you use useLayoutEffect instead of useEffect?",
+      "How do you handle async operations in useEffect?"
+    ],
+    "keyConcepts": [
+      "useEffect",
+      "Dependency Array",
+      "Cleanup",
+      "Stale Closure"
+    ],
+    "tags": [
+      "React",
+      "Hooks",
+      "useEffect"
+    ],
+    "realWorldContext": "The React team's documentation explicitly warns against overusing effects — most effects can be replaced with event handlers or derived state."
+  },
+  {
+    "id": "fs-009",
+    "roleId": "fullstack",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement optimistic updates in a React application?",
+    "answer": "Optimistic update: update UI immediately before server confirms, roll back on error. Implementation with React Query/TanStack Query: onMutate callback updates cache optimistically, onError rolls back using context saved in onMutate, onSettled refetches to sync with server. Manual approach: update local state immediately, fire API call, on error revert state and show error. Key considerations: generate temporary IDs for new items, handle concurrent mutations, show loading state for rollback. Works best for: likes, follows, todo toggles, form submissions.",
+    "explanation": "Optimistic updates make apps feel instant. The tradeoff is complexity — you must handle rollback gracefully. TanStack Query's mutation lifecycle makes this pattern straightforward.",
+    "followUpQuestions": [
+      "How do you handle optimistic updates with real-time sync (WebSockets)?",
+      "How do you prevent race conditions with multiple concurrent optimistic updates?"
+    ],
+    "keyConcepts": [
+      "Optimistic Updates",
+      "TanStack Query",
+      "Rollback",
+      "UX"
+    ],
+    "tags": [
+      "React",
+      "UX",
+      "TanStack Query",
+      "Performance"
+    ],
+    "realWorldContext": "Twitter's like button uses optimistic updates — the heart fills instantly, then syncs with the server."
+  },
+  {
+    "id": "fs-010",
+    "roleId": "fullstack",
+    "category": "behavioral",
+    "difficulty": "medium",
+    "question": "Describe a time you had to make a significant architectural decision under time pressure. What was your process?",
+    "answer": "STAR: Situation — production incident, needed to decide between quick fix vs proper solution in 2 hours. Task — balance immediate user impact vs technical debt. Action — timeboxed 15 min to list options with pros/cons, consulted one senior engineer, chose quick fix with explicit tech debt ticket and timeline. Communicated decision and rationale to team. Result — incident resolved in 45 min, tech debt addressed in next sprint. Key: document the decision and the context so future engineers understand why.",
+    "explanation": "Interviewers want to see structured decision-making under pressure, not paralysis. The ability to make a good-enough decision quickly and communicate it clearly is a senior engineering skill.",
+    "followUpQuestions": [
+      "How do you handle disagreement about architectural decisions in a team?",
+      "How do you document architectural decisions?"
+    ],
+    "keyConcepts": [
+      "Decision Making",
+      "Trade-offs",
+      "Communication",
+      "ADR"
+    ],
+    "tags": [
+      "Behavioral",
+      "Leadership",
+      "Architecture"
+    ],
+    "realWorldContext": "Architecture Decision Records (ADRs) are used at companies like Spotify and ThoughtWorks to document architectural decisions and their context."
+  },
+  {
+    "id": "fs-011",
+    "roleId": "backend",
+    "category": "system-design",
+    "difficulty": "hard",
+    "question": "Design a rate limiter for an API that supports per-user, per-IP, and per-endpoint limits.",
+    "answer": "Algorithm options: Token Bucket (smooth bursts), Sliding Window Log (accurate, memory-heavy), Sliding Window Counter (efficient, slightly approximate), Fixed Window (simple, burst at boundary). Implementation: Redis with atomic Lua scripts or INCR+EXPIRE. Key structure: rate_limit:{userId}:{endpoint}:{window}. Distributed: Redis Cluster for scale. Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, Retry-After. Middleware layer: apply before business logic. Fallback: if Redis unavailable, fail open (allow) or fail closed (deny) based on risk.",
+    "explanation": "Sliding Window Counter is the best balance of accuracy and efficiency. Redis atomic operations (MULTI/EXEC or Lua) prevent race conditions in distributed environments.",
+    "followUpQuestions": [
+      "How do you handle rate limiting across multiple data centers?",
+      "How do you implement rate limiting without Redis?"
+    ],
+    "keyConcepts": [
+      "Rate Limiting",
+      "Token Bucket",
+      "Sliding Window",
+      "Redis"
+    ],
+    "tags": [
+      "Backend",
+      "Rate Limiting",
+      "Redis",
+      "API"
+    ],
+    "realWorldContext": "Stripe, GitHub, and Twitter all use sliding window rate limiting with Redis for their public APIs."
+  },
+  {
+    "id": "fs-012",
+    "roleId": "backend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain database indexing. How do B-tree indexes work and when do you use composite indexes?",
+    "answer": "B-tree index: balanced tree structure, O(log n) lookups, supports range queries, equality, ORDER BY. Stored separately from table data. Composite index (a, b, c): follows leftmost prefix rule — queries on (a), (a,b), (a,b,c) use the index; queries on (b) alone do not. Column order matters: put equality columns first, range columns last. Index selectivity: high cardinality columns benefit most. Covering index: index contains all columns needed by query (no table lookup). Partial index: index subset of rows (WHERE is_active = true). Avoid: indexing every column (write overhead), low-cardinality columns.",
+    "explanation": "The leftmost prefix rule is the most commonly misunderstood indexing concept. Composite index (user_id, created_at) supports queries filtering by user_id with date range, but not date range alone.",
+    "followUpQuestions": [
+      "What is the difference between a clustered and non-clustered index?",
+      "How do you identify missing indexes in production?"
+    ],
+    "keyConcepts": [
+      "B-tree Index",
+      "Composite Index",
+      "Leftmost Prefix",
+      "Covering Index"
+    ],
+    "tags": [
+      "Database",
+      "Indexing",
+      "SQL",
+      "Performance"
+    ],
+    "realWorldContext": "Poorly indexed queries are the #1 cause of database performance issues in production applications."
+  },
+  {
+    "id": "fs-013",
+    "roleId": "backend",
+    "category": "system-design",
+    "difficulty": "expert",
+    "question": "Design a distributed job queue system that supports priorities, retries, and scheduled jobs.",
+    "answer": "Components: Job Producer (API/service), Queue (Redis with Sorted Sets for priority, BullMQ/Sidekiq), Workers (pull-based consumers), Job Store (PostgreSQL for persistence/history). Priority: Redis Sorted Set with priority as score. Retries: exponential backoff, max retry count, DLQ for failed jobs. Scheduled jobs: store next_run_at in DB, scheduler polls and enqueues. Distributed locking: Redis SETNX to prevent duplicate execution. Monitoring: job counts by status, processing time, failure rate. Horizontal scaling: multiple worker processes, each atomically claims jobs. Idempotency: job IDs prevent duplicate processing.",
+    "explanation": "BullMQ (Redis-based) and Sidekiq (Ruby/Redis) are production-proven implementations. The key challenge is exactly-once execution — Redis atomic operations and idempotent job handlers solve this.",
+    "followUpQuestions": [
+      "How do you handle long-running jobs that exceed worker timeout?",
+      "How do you implement job dependencies (job B runs after job A)?"
+    ],
+    "keyConcepts": [
+      "Job Queue",
+      "Redis",
+      "Priority Queue",
+      "Distributed Locking"
+    ],
+    "tags": [
+      "Backend",
+      "Job Queue",
+      "Redis",
+      "Distributed Systems"
+    ],
+    "realWorldContext": "Shopify processes millions of background jobs daily using Sidekiq. GitHub uses Resque for async job processing."
+  },
+  {
+    "id": "fs-014",
+    "roleId": "backend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What is the N+1 query problem and how do you solve it in different ORMs?",
+    "answer": "N+1: fetching N parent records then making 1 query per parent for related data = N+1 queries total. Example: fetch 100 users, then 100 separate queries for each user's posts. Solutions: Eager loading — JOIN or separate batch query. Prisma: include: { posts: true }. TypeORM: relations: ['posts']. Sequelize: include: [Post]. DataLoader (GraphQL): batches and deduplicates queries within a request. Raw SQL: JOIN with proper indexing. Detection: query logging, Bullet gem (Rails), Hibernate statistics. Always profile queries in development.",
+    "explanation": "N+1 is invisible in development with small datasets but catastrophic in production. ORMs make it easy to accidentally introduce — always check query counts when adding new data fetching.",
+    "followUpQuestions": [
+      "How does DataLoader solve N+1 in GraphQL?",
+      "When would you use raw SQL over an ORM?"
+    ],
+    "keyConcepts": [
+      "N+1 Problem",
+      "Eager Loading",
+      "DataLoader",
+      "ORM"
+    ],
+    "tags": [
+      "Database",
+      "ORM",
+      "Performance",
+      "GraphQL"
+    ],
+    "realWorldContext": "N+1 queries are responsible for a significant portion of database performance issues in Rails and Node.js applications."
+  },
+  {
+    "id": "fs-015",
+    "roleId": "backend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain ACID properties in databases. How does PostgreSQL implement them?",
+    "answer": "Atomicity: all operations in a transaction succeed or all fail. PostgreSQL: WAL (Write-Ahead Log) — changes written to log before data files, enables rollback. Consistency: transaction brings DB from one valid state to another. PostgreSQL: constraints, triggers, foreign keys enforced. Isolation: concurrent transactions don't interfere. PostgreSQL: MVCC (Multi-Version Concurrency Control) — readers don't block writers. Isolation levels: Read Committed (default), Repeatable Read, Serializable. Durability: committed transactions survive crashes. PostgreSQL: WAL flushed to disk before commit acknowledgment, fsync.",
+    "explanation": "MVCC is PostgreSQL's key innovation — it maintains multiple versions of rows, allowing readers to see a consistent snapshot without blocking writers. This is why PostgreSQL handles high concurrency well.",
+    "followUpQuestions": [
+      "What is the difference between optimistic and pessimistic locking?",
+      "When would you use Serializable isolation level?"
+    ],
+    "keyConcepts": [
+      "ACID",
+      "MVCC",
+      "WAL",
+      "Isolation Levels",
+      "PostgreSQL"
+    ],
+    "tags": [
+      "Database",
+      "PostgreSQL",
+      "ACID",
+      "Transactions"
+    ],
+    "realWorldContext": "Financial systems require ACID compliance — PostgreSQL's MVCC enables high-throughput transaction processing without sacrificing consistency."
+  },
+  {
+    "id": "fs-016",
+    "roleId": "backend",
+    "category": "system-design",
+    "difficulty": "hard",
+    "question": "Design a caching strategy for a high-traffic e-commerce product catalog.",
+    "answer": "Multi-layer caching: 1) CDN (CloudFront): cache product pages, images, static assets. TTL: 1 hour for product pages, 24h for images. 2) Application cache (Redis): product data, inventory counts, search results. TTL: 5 min for inventory (changes frequently), 1 hour for product details. 3) Database query cache: PostgreSQL query plan cache. Cache patterns: Cache-aside (lazy loading) for product details. Write-through for inventory updates. Cache invalidation: event-driven (product update → invalidate cache key). Stampede prevention: probabilistic early expiration or mutex lock on cache miss.",
+    "explanation": "Cache invalidation is the hard part. Event-driven invalidation (publish product_updated event → invalidate cache) is more reliable than TTL-only for frequently updated data.",
+    "followUpQuestions": [
+      "How do you handle cache stampede (thundering herd)?",
+      "How do you implement cache warming for new deployments?"
+    ],
+    "keyConcepts": [
+      "Caching",
+      "Redis",
+      "CDN",
+      "Cache Invalidation",
+      "Cache-aside"
+    ],
+    "tags": [
+      "Backend",
+      "Caching",
+      "Redis",
+      "E-commerce"
+    ],
+    "realWorldContext": "Amazon's product catalog uses aggressive multi-layer caching — most product page loads never hit the database."
+  },
+  {
+    "id": "fs-017",
+    "roleId": "backend",
+    "category": "technical",
+    "difficulty": "expert",
+    "question": "How do you implement distributed transactions across microservices without 2PC?",
+    "answer": "2PC problems: blocking protocol, coordinator SPOF, poor performance. Alternatives: 1) Saga pattern: sequence of local transactions, each publishing events. Choreography (event-driven) or Orchestration (central coordinator). Compensating transactions for rollback. 2) Outbox pattern: write to local DB and outbox table atomically, separate process publishes outbox events. Ensures at-least-once delivery. 3) Event sourcing: state derived from event log, natural audit trail. 4) Idempotent consumers: handle duplicate events safely. Choose saga for: long-running business transactions. Outbox for: reliable event publishing.",
+    "explanation": "The saga pattern trades ACID for eventual consistency. Compensating transactions must be idempotent and always succeed. The outbox pattern solves the dual-write problem (write to DB and publish event atomically).",
+    "followUpQuestions": [
+      "What is the difference between choreography and orchestration sagas?",
+      "How do you handle saga rollback when a compensating transaction fails?"
+    ],
+    "keyConcepts": [
+      "Saga Pattern",
+      "Outbox Pattern",
+      "Distributed Transactions",
+      "Eventual Consistency"
+    ],
+    "tags": [
+      "Backend",
+      "Microservices",
+      "Distributed Systems",
+      "Saga"
+    ],
+    "realWorldContext": "Uber uses the saga pattern for trip lifecycle management across multiple microservices (payment, driver, rider, maps)."
+  },
+  {
+    "id": "fs-018",
+    "roleId": "backend",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is connection pooling and why is it critical for database performance?",
+    "answer": "Connection pooling: maintain a pool of reusable database connections instead of creating/destroying per request. Creating a DB connection is expensive (TCP handshake, auth, memory allocation ~5-10ms). Pool maintains N connections, requests borrow and return. Tools: PgBouncer (PostgreSQL), HikariCP (Java), pg-pool (Node.js). Key settings: min/max pool size, connection timeout, idle timeout. Serverless challenge: Lambda creates new connections per invocation — use RDS Proxy (connection pooler for RDS/Aurora) to prevent connection exhaustion. Without pooling: 1000 concurrent requests = 1000 DB connections = DB crash.",
+    "explanation": "PostgreSQL has a hard limit on connections (~100-200 by default). Without pooling, serverless functions or high-concurrency apps exhaust connections quickly. RDS Proxy is the AWS-native solution.",
+    "followUpQuestions": [
+      "What is the difference between connection pooling modes in PgBouncer?",
+      "How do you size a connection pool?"
+    ],
+    "keyConcepts": [
+      "Connection Pooling",
+      "PgBouncer",
+      "RDS Proxy",
+      "Database Performance"
+    ],
+    "tags": [
+      "Backend",
+      "Database",
+      "Performance",
+      "PostgreSQL"
+    ],
+    "realWorldContext": "Serverless applications on AWS universally use RDS Proxy to prevent Lambda functions from exhausting database connections."
+  },
+  {
+    "id": "fs-019",
+    "roleId": "backend",
+    "category": "scenario",
+    "difficulty": "hard",
+    "question": "Your API response times increased from 50ms to 2000ms after a deployment. How do you debug this?",
+    "answer": "1) Check deployment diff — what changed? New query? New dependency? Config change? 2) APM traces (Datadog/New Relic/X-Ray) — identify which function/query is slow. 3) Database: slow query log, EXPLAIN ANALYZE on suspect queries, check for missing indexes, lock waits. 4) External dependencies: check third-party API latency, Redis latency. 5) Memory: check for GC pressure, memory leaks causing GC pauses. 6) CPU: check for CPU-bound operations (crypto, serialization). 7) Network: check for DNS resolution issues, connection pool exhaustion. Rollback if critical, fix forward if minor.",
+    "explanation": "The deployment diff is always the first place to look — 90% of performance regressions are caused by the most recent change. APM traces pinpoint the exact slow operation.",
+    "followUpQuestions": [
+      "How do you implement performance regression testing in CI/CD?",
+      "How do you set up alerting for API latency degradation?"
+    ],
+    "keyConcepts": [
+      "Performance Debugging",
+      "APM",
+      "Slow Query Log",
+      "EXPLAIN ANALYZE"
+    ],
+    "tags": [
+      "Backend",
+      "Performance",
+      "Debugging",
+      "Observability"
+    ],
+    "realWorldContext": "Performance regressions from missing database indexes are one of the most common post-deployment incidents."
+  },
+  {
+    "id": "fs-020",
+    "roleId": "backend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain event sourcing and CQRS. When are they appropriate?",
+    "answer": "Event Sourcing: store state as sequence of immutable events, not current state. Current state derived by replaying events. Benefits: complete audit log, temporal queries, event replay for debugging, natural integration with event-driven systems. CQRS (Command Query Responsibility Segregation): separate read and write models. Write model: handles commands, validates business rules, emits events. Read model: optimized projections for queries (denormalized, fast). Often combined: commands → events → projections. Appropriate for: complex domains with audit requirements, high read/write ratio imbalance, event-driven microservices. Overkill for: simple CRUD apps.",
+    "explanation": "Event sourcing adds significant complexity — event schema evolution, eventual consistency, projection rebuilding. Use only when audit trail or temporal queries are genuine requirements.",
+    "followUpQuestions": [
+      "How do you handle event schema evolution in event sourcing?",
+      "How do you rebuild projections without downtime?"
+    ],
+    "keyConcepts": [
+      "Event Sourcing",
+      "CQRS",
+      "Projections",
+      "Audit Log"
+    ],
+    "tags": [
+      "Backend",
+      "Architecture",
+      "Event Sourcing",
+      "CQRS"
+    ],
+    "realWorldContext": "Axon Framework (Java) and EventStoreDB are popular event sourcing implementations used in banking and insurance."
+  },
+  {
+    "id": "fs-021",
+    "roleId": "backend",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is idempotency in APIs and how do you implement it?",
+    "answer": "Idempotent operation: calling it multiple times produces the same result as calling once. GET, PUT, DELETE are idempotent. POST is not by default. Implementation: client sends Idempotency-Key header (UUID). Server stores key → response in Redis/DB with TTL. On duplicate request, return cached response without re-processing. Critical for: payment APIs (prevent double charges), order creation, email sending. Stripe's idempotency keys are the gold standard — 24-hour TTL, stored per API key.",
+    "explanation": "Idempotency is essential for retry safety. Network failures cause clients to retry — without idempotency, retries cause duplicate payments, orders, or emails.",
+    "followUpQuestions": [
+      "How do you handle idempotency for long-running async operations?",
+      "What TTL should you use for idempotency keys?"
+    ],
+    "keyConcepts": [
+      "Idempotency",
+      "Idempotency Key",
+      "Retry Safety",
+      "API Design"
+    ],
+    "tags": [
+      "Backend",
+      "API Design",
+      "Reliability"
+    ],
+    "realWorldContext": "Stripe's idempotency key system prevents duplicate charges when payment requests are retried due to network timeouts."
+  },
+  {
+    "id": "fs-022",
+    "roleId": "backend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you design a database schema for a multi-tenant SaaS application?",
+    "answer": "Three approaches: 1) Separate databases per tenant: strongest isolation, highest cost, complex migrations. 2) Separate schemas per tenant (PostgreSQL): good isolation, shared DB server, schema-per-tenant migrations. 3) Shared schema with tenant_id column: most efficient, requires row-level security (PostgreSQL RLS) or application-level filtering. Shared schema best practices: tenant_id on every table, composite indexes (tenant_id, other_columns), RLS policies to prevent data leakage, connection pooling per tenant. Hybrid: large tenants get dedicated DB, small tenants share.",
+    "explanation": "Shared schema with RLS is the most scalable approach. PostgreSQL Row Level Security enforces tenant isolation at the database level, preventing application bugs from leaking data.",
+    "followUpQuestions": [
+      "How do you implement PostgreSQL Row Level Security?",
+      "How do you handle tenant-specific customizations in a shared schema?"
+    ],
+    "keyConcepts": [
+      "Multi-tenancy",
+      "Row Level Security",
+      "Schema Design",
+      "Tenant Isolation"
+    ],
+    "tags": [
+      "Backend",
+      "Database",
+      "Multi-tenant",
+      "PostgreSQL"
+    ],
+    "realWorldContext": "Salesforce uses a shared schema with tenant_id for their multi-tenant platform serving 150,000+ organizations."
+  },
+  {
+    "id": "fs-023",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is the difference between controlled and uncontrolled components in React?",
+    "answer": "Controlled: form element value driven by React state. onChange updates state, state drives value. Single source of truth. Enables validation, conditional disabling, formatted input. Uncontrolled: form element manages its own state in DOM. Access via ref (useRef). Simpler for basic forms, file inputs must be uncontrolled. React Hook Form uses uncontrolled inputs with refs for performance (avoids re-render on every keystroke). Choose controlled for: complex validation, dependent fields, programmatic value changes. Uncontrolled for: simple forms, file uploads, performance-critical forms.",
+    "explanation": "React Hook Form's success is built on uncontrolled inputs — it avoids the performance cost of re-rendering on every keystroke by reading values from DOM refs only on submit.",
+    "followUpQuestions": [
+      "How does React Hook Form achieve better performance than controlled forms?",
+      "When must you use an uncontrolled component?"
+    ],
+    "keyConcepts": [
+      "Controlled Components",
+      "Uncontrolled Components",
+      "React Hook Form",
+      "Refs"
+    ],
+    "tags": [
+      "React",
+      "Forms",
+      "Performance"
+    ],
+    "realWorldContext": "Large forms with 50+ fields benefit significantly from uncontrolled inputs — React Hook Form reduces re-renders by 90%+ vs controlled inputs."
+  },
+  {
+    "id": "fs-024",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you optimize a React application's bundle size and loading performance?",
+    "answer": "Code splitting: React.lazy + Suspense for route-level splitting. Dynamic imports for heavy libraries. Tree shaking: ES modules enable dead code elimination (use named imports, not default imports of large libraries). Bundle analysis: webpack-bundle-analyzer or Vite's rollup-plugin-visualizer. Specific optimizations: replace moment.js with date-fns, lodash with lodash-es, use lighter alternatives. Image optimization: next/image, WebP format, lazy loading. Preloading: <link rel=preload> for critical resources. Compression: Brotli > gzip. Target: <200KB initial JS bundle.",
+    "explanation": "Route-level code splitting is the highest-impact optimization — users only download code for the current page. Bundle analyzer reveals which libraries are bloating the bundle.",
+    "followUpQuestions": [
+      "How do you implement prefetching for likely next routes?",
+      "What is the difference between code splitting and lazy loading?"
+    ],
+    "keyConcepts": [
+      "Code Splitting",
+      "Tree Shaking",
+      "Bundle Size",
+      "React.lazy"
+    ],
+    "tags": [
+      "Frontend",
+      "Performance",
+      "React",
+      "Webpack"
+    ],
+    "realWorldContext": "Google's Core Web Vitals directly impact SEO — bundle size optimization is critical for LCP and FID scores."
+  },
+  {
+    "id": "fs-025",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "Explain CSS-in-JS vs CSS Modules vs Tailwind CSS. What are the tradeoffs?",
+    "answer": "CSS-in-JS (styled-components, Emotion): styles co-located with components, dynamic styles via props, runtime overhead, good DX. CSS Modules: locally scoped CSS, no runtime overhead, works with any CSS, less dynamic. Tailwind CSS: utility-first, no custom CSS needed, consistent design system, verbose JSX, excellent performance (PurgeCSS removes unused). Zero-runtime CSS-in-JS (Linaria, vanilla-extract): compile-time extraction, no runtime overhead. Trend: Tailwind dominates new projects for its consistency and performance. CSS-in-JS losing favor due to runtime cost and React Server Components incompatibility.",
+    "explanation": "CSS-in-JS has a runtime cost that matters at scale. React Server Components can't use runtime CSS-in-JS (no JS execution on server). This is driving adoption of Tailwind and zero-runtime alternatives.",
+    "followUpQuestions": [
+      "Why can't you use styled-components with React Server Components?",
+      "How does Tailwind's JIT compiler work?"
+    ],
+    "keyConcepts": [
+      "CSS-in-JS",
+      "CSS Modules",
+      "Tailwind",
+      "Styling"
+    ],
+    "tags": [
+      "Frontend",
+      "CSS",
+      "Tailwind",
+      "Styling"
+    ],
+    "realWorldContext": "Vercel migrated their dashboard from styled-components to Tailwind for better performance and Server Components compatibility."
+  },
+  {
+    "id": "fs-026",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What are Web Vitals and how do you measure and improve them?",
+    "answer": "Core Web Vitals: LCP (Largest Contentful Paint) <2.5s — largest visible element loaded. FID/INP (Interaction to Next Paint) <200ms — responsiveness to user input. CLS (Cumulative Layout Shift) <0.1 — visual stability. Measurement: Chrome DevTools, Lighthouse, PageSpeed Insights, web-vitals JS library, RUM (Real User Monitoring). Improve LCP: optimize images (WebP, preload hero image), reduce TTFB (CDN, SSR), eliminate render-blocking resources. Improve INP: break up long tasks, use web workers, defer non-critical JS. Improve CLS: set explicit dimensions on images/videos, avoid inserting content above existing content.",
+    "explanation": "Core Web Vitals are Google ranking signals since 2021. INP replaced FID in 2024 as a better measure of responsiveness. Real user monitoring (RUM) is more accurate than lab testing.",
+    "followUpQuestions": [
+      "How do you measure Core Web Vitals in production?",
+      "What causes high CLS scores and how do you fix them?"
+    ],
+    "keyConcepts": [
+      "Core Web Vitals",
+      "LCP",
+      "INP",
+      "CLS",
+      "Performance"
+    ],
+    "tags": [
+      "Frontend",
+      "Performance",
+      "SEO",
+      "Web Vitals"
+    ],
+    "realWorldContext": "E-commerce sites see direct revenue impact from Core Web Vitals — Google reports 0.1s improvement in LCP increases conversions by 8%."
+  },
+  {
+    "id": "fs-027",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "How do you implement accessibility (a11y) in a React application?",
+    "answer": "Semantic HTML: use button not div for clickable elements, nav, main, header landmarks. ARIA: aria-label for icon buttons, aria-expanded for accordions, aria-live for dynamic content, role for custom widgets. Keyboard navigation: all interactive elements focusable, logical tab order, visible focus indicators, Escape closes modals. Color contrast: WCAG AA requires 4.5:1 for normal text. Screen reader testing: NVDA (Windows), VoiceOver (Mac). Tools: axe-core, eslint-plugin-jsx-a11y, Lighthouse accessibility audit. Focus management: move focus to modal on open, return on close.",
+    "explanation": "Accessibility is a legal requirement (ADA, WCAG) and improves UX for all users. The most common violations: missing alt text, insufficient color contrast, non-keyboard-accessible custom components.",
+    "followUpQuestions": [
+      "How do you test accessibility in automated CI/CD?",
+      "What is the difference between WCAG AA and AAA?"
+    ],
+    "keyConcepts": [
+      "Accessibility",
+      "ARIA",
+      "WCAG",
+      "Semantic HTML",
+      "Keyboard Navigation"
+    ],
+    "tags": [
+      "Frontend",
+      "Accessibility",
+      "a11y",
+      "React"
+    ],
+    "realWorldContext": "Target paid $6M in an ADA accessibility lawsuit. Accessibility compliance is both ethical and legally required for public-facing applications."
+  },
+  {
+    "id": "fs-028",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain TypeScript generics. How do you use them to build type-safe utility functions?",
+    "answer": "Generics: type parameters that make functions/classes work with multiple types while maintaining type safety. Basic: function identity<T>(arg: T): T. Constrained: <T extends object>. Conditional types: T extends string ? 'string' : 'other'. Mapped types: { [K in keyof T]: T[K] }. Utility types built with generics: Partial<T>, Required<T>, Pick<T, K>, Omit<T, K>, ReturnType<T>. Real example: type-safe API fetcher: async function fetchApi<T>(url: string): Promise<T>. Infer keyword: extract types from other types.",
+    "explanation": "Generics are the foundation of TypeScript's type system. Understanding them unlocks building reusable, type-safe abstractions. The key insight: generics are resolved at call site, not definition site.",
+    "followUpQuestions": [
+      "What is the difference between unknown and any in TypeScript?",
+      "How do you use conditional types to create discriminated unions?"
+    ],
+    "keyConcepts": [
+      "TypeScript Generics",
+      "Conditional Types",
+      "Mapped Types",
+      "Type Safety"
+    ],
+    "tags": [
+      "TypeScript",
+      "Frontend",
+      "Type System"
+    ],
+    "realWorldContext": "TanStack Query's entire API is built on TypeScript generics — useQuery<TData, TError> provides end-to-end type safety."
+  },
+  {
+    "id": "fs-029",
+    "roleId": "frontend",
+    "category": "system-design",
+    "difficulty": "hard",
+    "question": "How do you architect a large-scale React application for maintainability?",
+    "answer": "Feature-based folder structure: src/features/auth, src/features/dashboard — co-locate components, hooks, API calls, types per feature. Shared: src/components (design system), src/hooks (shared hooks), src/utils. State management: server state (TanStack Query), client state (Zustand/Jotai for simple, Redux for complex). API layer: centralized API client with interceptors, typed endpoints. Design system: component library with Storybook. Testing: unit (Vitest), integration (Testing Library), E2E (Playwright). Barrel exports: index.ts per feature for clean imports. Absolute imports via tsconfig paths.",
+    "explanation": "Feature-based structure scales better than type-based (components/, hooks/, utils/ at root) — related code stays together, reducing cognitive load when working on a feature.",
+    "followUpQuestions": [
+      "How do you enforce architectural boundaries in a large codebase?",
+      "How do you manage shared state between features?"
+    ],
+    "keyConcepts": [
+      "Feature-based Architecture",
+      "State Management",
+      "Design System",
+      "Scalability"
+    ],
+    "tags": [
+      "Frontend",
+      "Architecture",
+      "React",
+      "Scalability"
+    ],
+    "realWorldContext": "Shopify's Polaris and Atlassian's Atlaskit are examples of large-scale React design systems with feature-based architecture."
+  },
+  {
+    "id": "fs-030",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is the virtual DOM and why did React introduce it? What are its limitations?",
+    "answer": "Virtual DOM: lightweight JavaScript representation of the real DOM. React diffs vDOM trees (reconciliation) and applies minimal real DOM updates (commit phase). Why: real DOM operations are expensive (layout, paint, composite). Batching vDOM updates reduces real DOM thrashing. Limitations: 1) Memory overhead of maintaining vDOM tree. 2) Diffing has O(n) cost. 3) Not always faster than direct DOM manipulation for simple cases. Alternatives: Svelte compiles to direct DOM updates (no vDOM), Solid.js uses fine-grained reactivity. React 18 Concurrent Mode improves scheduling but doesn't eliminate vDOM.",
+    "explanation": "The vDOM's value is developer experience (declarative UI) as much as performance. Svelte proves you don't need vDOM for fast UIs, but React's ecosystem and developer experience keep it dominant.",
+    "followUpQuestions": [
+      "How does Svelte's approach differ from React's virtual DOM?",
+      "What is fine-grained reactivity in Solid.js?"
+    ],
+    "keyConcepts": [
+      "Virtual DOM",
+      "Reconciliation",
+      "DOM Performance",
+      "React"
+    ],
+    "tags": [
+      "React",
+      "Frontend",
+      "Performance",
+      "Virtual DOM"
+    ],
+    "realWorldContext": "React's virtual DOM enabled Facebook to build complex UIs declaratively — the performance was good enough and the DX was transformative."
+  },
+  {
+    "id": "fs-031",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement a design system in React? What are the key components?",
+    "answer": "Foundation: design tokens (colors, spacing, typography, shadows) as CSS variables or JS constants. Component library: Button, Input, Modal, Table, etc. with consistent API. Variants via props (variant='primary'|'secondary'). Compound components for complex UI (Select with Option). Accessibility built-in. Documentation: Storybook for component playground and docs. Distribution: npm package or monorepo with Turborepo. Theming: CSS variables enable runtime theme switching. Testing: visual regression with Chromatic. Versioning: semantic versioning, changelog. Governance: RFC process for new components.",
+    "explanation": "Design tokens are the foundation — they ensure visual consistency across components. CSS variables enable theming without JavaScript. Storybook is the industry standard for component documentation.",
+    "followUpQuestions": [
+      "How do you handle breaking changes in a design system used by 50 teams?",
+      "What is the compound component pattern?"
+    ],
+    "keyConcepts": [
+      "Design System",
+      "Design Tokens",
+      "Storybook",
+      "Component Library"
+    ],
+    "tags": [
+      "Frontend",
+      "Design System",
+      "React",
+      "Component Library"
+    ],
+    "realWorldContext": "Airbnb's DLS, GitHub's Primer, and Shopify's Polaris are production design systems that power their entire product suite."
+  },
+  {
+    "id": "fs-032",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is lazy loading and code splitting? How do you implement them in React?",
+    "answer": "Code splitting: split bundle into chunks loaded on demand. React.lazy: const Dashboard = React.lazy(() => import('./Dashboard')). Wrap in Suspense with fallback. Route-based splitting: each route is a separate chunk. Component-based: heavy components (charts, editors) loaded on demand. Preloading: import('./Dashboard') on hover/focus before click. Vite/webpack automatically split dynamic imports. Image lazy loading: loading='lazy' attribute or Intersection Observer. Benefits: smaller initial bundle, faster TTI (Time to Interactive). Trade-off: waterfall requests if not preloaded.",
+    "explanation": "Route-based code splitting is the minimum — every SPA should do this. Component-level splitting for heavy libraries (Monaco editor, chart libraries) provides additional gains.",
+    "followUpQuestions": [
+      "How do you preload lazy components to avoid loading spinners?",
+      "What is the difference between lazy loading and prefetching?"
+    ],
+    "keyConcepts": [
+      "Code Splitting",
+      "React.lazy",
+      "Suspense",
+      "Dynamic Import"
+    ],
+    "tags": [
+      "Frontend",
+      "Performance",
+      "React",
+      "Code Splitting"
+    ],
+    "realWorldContext": "Next.js does automatic code splitting per page — this is one of its core performance advantages over CRA."
+  },
+  {
+    "id": "fs-033",
+    "roleId": "frontend",
+    "category": "behavioral",
+    "difficulty": "medium",
+    "question": "How do you approach cross-browser compatibility issues in a production application?",
+    "answer": "Prevention: use caniuse.com to check feature support before using. Browserslist config in package.json defines target browsers. Babel transpiles modern JS, PostCSS autoprefixer adds vendor prefixes. Testing: BrowserStack or Sauce Labs for cross-browser testing, Playwright supports multiple browsers. Common issues: CSS Grid/Flexbox quirks in Safari, ES2020+ features in older browsers, Web APIs (IntersectionObserver, ResizeObserver) needing polyfills. Progressive enhancement: core functionality works everywhere, enhanced experience for modern browsers. Analytics: check your actual user browser distribution before over-engineering.",
+    "explanation": "Check your analytics first — if 99% of users are on Chrome/Firefox/Safari modern versions, extensive IE11 support is wasted effort. Progressive enhancement is more pragmatic than graceful degradation.",
+    "followUpQuestions": [
+      "How do you handle Safari-specific CSS bugs?",
+      "What is the difference between progressive enhancement and graceful degradation?"
+    ],
+    "keyConcepts": [
+      "Cross-browser Compatibility",
+      "Browserslist",
+      "Polyfills",
+      "Progressive Enhancement"
+    ],
+    "tags": [
+      "Frontend",
+      "Browser Compatibility",
+      "Testing"
+    ],
+    "realWorldContext": "Most enterprise applications dropped IE11 support in 2022 after Microsoft ended support — dramatically simplifying frontend development."
+  },
+  {
+    "id": "fs-034",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain the browser's rendering pipeline. How does it affect frontend performance?",
+    "answer": "Pipeline: Parse HTML → DOM tree. Parse CSS → CSSOM. Combine → Render tree. Layout (reflow): calculate positions/sizes. Paint: fill pixels. Composite: layer composition on GPU. Performance implications: Layout thrashing — reading then writing layout properties in a loop forces synchronous reflow. Avoid: read all, then write all. CSS properties that trigger layout (width, height, top) vs paint only (color, background) vs composite only (transform, opacity). Animations: use transform/opacity (compositor thread, no layout/paint). will-change: hint browser to promote element to its own layer. requestAnimationFrame for JS animations.",
+    "explanation": "transform and opacity are the only CSS properties that animate on the compositor thread without triggering layout or paint. This is why all smooth animations should use these properties.",
+    "followUpQuestions": [
+      "What is layout thrashing and how do you detect it?",
+      "When would you use will-change and what are its costs?"
+    ],
+    "keyConcepts": [
+      "Rendering Pipeline",
+      "Layout",
+      "Paint",
+      "Composite",
+      "Performance"
+    ],
+    "tags": [
+      "Frontend",
+      "Browser",
+      "Performance",
+      "CSS"
+    ],
+    "realWorldContext": "Google's animation guidelines mandate transform/opacity-only animations for 60fps performance on mobile devices."
+  },
+  {
+    "id": "fs-035",
+    "roleId": "frontend",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement state management in a large React application? Compare Zustand, Redux Toolkit, and Jotai.",
+    "answer": "Redux Toolkit: mature, DevTools, time-travel debugging, good for complex state with many interactions, boilerplate reduced vs classic Redux. Best for: large teams, complex state machines, need for middleware. Zustand: minimal API, no boilerplate, works outside React, easy async. Best for: medium complexity, teams preferring simplicity. Jotai: atomic state (like Recoil), bottom-up composition, excellent for derived state, React Suspense integration. Best for: fine-grained subscriptions, avoiding unnecessary re-renders. Rule: don't put server state in client state manager — use TanStack Query for server state, client state manager for UI state only.",
+    "explanation": "The biggest mistake is using Redux/Zustand for server state (API data). TanStack Query handles caching, refetching, and synchronization better. Client state managers should only hold UI state (modals, filters, user preferences).",
+    "followUpQuestions": [
+      "How do you decide what goes in global state vs local state?",
+      "How do you handle state persistence across page refreshes?"
+    ],
+    "keyConcepts": [
+      "State Management",
+      "Zustand",
+      "Redux Toolkit",
+      "Jotai",
+      "TanStack Query"
+    ],
+    "tags": [
+      "React",
+      "State Management",
+      "Frontend Architecture"
+    ],
+    "realWorldContext": "Vercel uses Jotai for their dashboard. Linear uses Zustand. Both avoid Redux for new projects due to boilerplate overhead."
+  }
+]

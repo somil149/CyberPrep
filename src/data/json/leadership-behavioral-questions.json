@@ -1,0 +1,162 @@
+[
+  {
+    "id": "em-001", "roleId": "engineering-manager", "category": "behavioral", "difficulty": "medium",
+    "question": "How do you handle a high-performing engineer who consistently misses deadlines?",
+    "answer": "1) Have a direct 1:1 conversation — understand root cause. Is it scope creep they're creating? Unclear requirements? Personal issues? Perfectionism? 2) Distinguish between can't vs won't. 3) If scope creep: work together to define done, timebox tasks, daily check-ins. 4) Set clear expectations with specific deadlines and consequences. 5) If pattern continues after support: performance improvement plan. 6) Document conversations. Never assume — always investigate first.",
+    "explanation": "High performers missing deadlines is often a sign of unclear scope, perfectionism, or taking on too much. The manager's job is to remove blockers and set clear expectations, not just escalate.",
+    "followUpQuestions": ["How do you differentiate between a performance issue and a management issue?", "How do you give feedback to someone who is defensive?"],
+    "keyConcepts": ["Performance Management", "Feedback", "Coaching", "Accountability"],
+    "tags": ["Leadership", "Management", "Performance"],
+    "realWorldContext": "Engineering managers at Google and Meta are trained to distinguish between skill gaps (coaching needed) and will gaps (accountability needed)."
+  },
+  {
+    "id": "em-002", "roleId": "engineering-manager", "category": "behavioral", "difficulty": "hard",
+    "question": "How do you build psychological safety in an engineering team?",
+    "answer": "Actions: 1) Model vulnerability — share your own mistakes and learnings publicly. 2) Reward speaking up — explicitly thank people who raise concerns or disagree. 3) Blameless post-mortems — focus on systems, not individuals. 4) Separate idea evaluation from person evaluation. 5) Create low-stakes opportunities to speak up (retros, anonymous surveys). 6) Follow through on feedback — if people raise issues and nothing changes, they stop raising issues. 7) Address dismissive behavior immediately. Measure: do junior engineers speak up in meetings? Do people admit mistakes?",
+    "explanation": "Google's Project Aristotle found psychological safety is the #1 predictor of team performance. It's built through consistent behavior over time, not a single initiative.",
+    "followUpQuestions": ["How do you handle a senior engineer who dismisses junior engineers' ideas?", "How do you measure psychological safety?"],
+    "keyConcepts": ["Psychological Safety", "Team Culture", "Blameless Post-mortems"],
+    "tags": ["Leadership", "Culture", "Team Building"],
+    "realWorldContext": "Google's Project Aristotle research identified psychological safety as the most important factor in high-performing teams."
+  },
+  {
+    "id": "em-003", "roleId": "engineering-manager", "category": "behavioral", "difficulty": "hard",
+    "question": "How do you manage a team through a major technical migration (e.g., monolith to microservices) while maintaining feature velocity?",
+    "answer": "Strategy: 1) Don't stop feature work — migration must happen alongside delivery. 2) Strangler fig pattern — incrementally extract services, don't big-bang rewrite. 3) Allocate explicit capacity — 20-30% of sprint for migration work. 4) Define clear milestones and success metrics. 5) Communicate progress to stakeholders — show value incrementally. 6) Protect the team from scope creep during migration. 7) Celebrate migration milestones. 8) Have rollback plan for each phase. Key risk: migration fatigue — keep momentum with visible wins.",
+    "explanation": "Big-bang rewrites almost always fail. The strangler fig pattern (incrementally replace pieces) maintains delivery while making progress. Explicit capacity allocation prevents migration from being perpetually deprioritized.",
+    "followUpQuestions": ["How do you handle stakeholder pressure to speed up the migration?", "How do you keep the team motivated during a long migration?"],
+    "keyConcepts": ["Technical Migration", "Strangler Fig", "Capacity Planning", "Change Management"],
+    "tags": ["Leadership", "Technical Strategy", "Migration"],
+    "realWorldContext": "Amazon's migration from monolith to microservices took years and was done incrementally while continuing to ship features."
+  },
+  {
+    "id": "em-004", "roleId": "engineering-manager", "category": "behavioral", "difficulty": "medium",
+    "question": "How do you run effective 1:1 meetings with your engineers?",
+    "answer": "Principles: 1) It's their meeting, not yours — let them set the agenda. 2) Not a status update — use async tools for status. 3) Focus on: career growth, blockers, team dynamics, feedback. 4) Consistent cadence — weekly for new/struggling engineers, bi-weekly for senior. 5) Take notes and follow up on action items. 6) Ask open questions: 'What's on your mind?', 'What would make your work easier?', 'What are you learning?'. 7) Give feedback regularly, not just at review time. 8) Discuss career goals quarterly.",
+    "explanation": "1:1s are the most important management tool. Engineers who feel heard and supported are more engaged and less likely to leave. The biggest mistake is turning 1:1s into status meetings.",
+    "followUpQuestions": ["How do you handle an engineer who says everything is fine but seems disengaged?", "How do you give critical feedback in a 1:1?"],
+    "keyConcepts": ["1:1 Meetings", "Coaching", "Career Development", "Feedback"],
+    "tags": ["Leadership", "Management", "Communication"],
+    "realWorldContext": "Managers at top tech companies are evaluated on their 1:1 quality — it's a core management competency in performance reviews."
+  },
+  {
+    "id": "em-005", "roleId": "engineering-manager", "category": "behavioral", "difficulty": "hard",
+    "question": "How do you handle conflict between two senior engineers on your team?",
+    "answer": "Process: 1) Understand both perspectives separately — 1:1 with each person. 2) Identify: is it a technical disagreement or interpersonal conflict? 3) Technical: facilitate a structured decision-making process (RFC, spike, data-driven decision). Set a deadline for the decision. 4) Interpersonal: address behavior directly, focus on impact not intent. 5) Bring them together to find common ground. 6) If unresolved: make the call as manager, explain reasoning. 7) Address underlying issues — often conflict is a symptom of unclear ownership or competing priorities.",
+    "explanation": "Unresolved conflict between senior engineers is toxic to team culture. Managers who avoid conflict enable it. The goal is resolution, not just peace — sometimes that means making a decision they don't both like.",
+    "followUpQuestions": ["How do you prevent recurring conflict between the same people?", "When do you escalate to HR?"],
+    "keyConcepts": ["Conflict Resolution", "Technical Decision Making", "Team Dynamics"],
+    "tags": ["Leadership", "Conflict Resolution", "Management"],
+    "realWorldContext": "Technical conflicts between senior engineers are common in fast-growing companies — clear ownership and decision-making frameworks prevent most of them."
+  },
+  {
+    "id": "em-006", "roleId": "engineering-manager", "category": "behavioral", "difficulty": "expert",
+    "question": "How do you build and execute a technical roadmap that balances new features, tech debt, and reliability?",
+    "answer": "Framework: 1) Categorize work: features (business value), tech debt (velocity tax), reliability (risk reduction), innovation (future bets). 2) Typical allocation: 70% features, 20% tech debt/reliability, 10% innovation. Adjust based on context. 3) Make tech debt visible — quantify its cost (e.g., 'this debt costs us 2 days/sprint'). 4) Tie reliability work to business risk (e.g., 'this outage risk costs $X/hour'). 5) Quarterly planning: align with product roadmap, negotiate capacity. 6) Communicate tradeoffs clearly to stakeholders — don't hide tech debt. 7) Track and measure: velocity trends, incident rates, deployment frequency.",
+    "explanation": "Tech debt is invisible to stakeholders unless you make it visible. Quantifying its cost in business terms (lost velocity, incident risk) is the key to getting investment.",
+    "followUpQuestions": ["How do you get product managers to prioritize tech debt?", "How do you measure the impact of tech debt reduction?"],
+    "keyConcepts": ["Technical Roadmap", "Tech Debt", "Capacity Planning", "Stakeholder Management"],
+    "tags": ["Leadership", "Technical Strategy", "Roadmap"],
+    "realWorldContext": "Spotify's 'squad model' allocates explicit capacity for tech debt and reliability work in every sprint."
+  },
+  {
+    "id": "em-007", "roleId": "engineering-manager", "category": "behavioral", "difficulty": "medium",
+    "question": "How do you onboard a new engineer to be productive quickly?",
+    "answer": "Week 1: environment setup, codebase tour, meet the team, understand the product. Assign a buddy (senior engineer). Week 2-4: first small task (bug fix or small feature) to build confidence and learn the workflow. Month 2: own a feature end-to-end with support. Month 3: fully independent. Key elements: written onboarding guide (don't rely on tribal knowledge), clear 30/60/90 day expectations, regular check-ins, psychological safety to ask questions. Measure: time to first PR, time to first independent feature. Common mistake: throwing new engineers into complex tasks too early.",
+    "explanation": "Structured onboarding reduces time-to-productivity from months to weeks. The buddy system is the highest-impact element — having a go-to person for questions removes friction.",
+    "followUpQuestions": ["How do you onboard a senior engineer differently from a junior?", "How do you measure onboarding effectiveness?"],
+    "keyConcepts": ["Onboarding", "Ramp-up", "Mentorship", "30/60/90 Plan"],
+    "tags": ["Leadership", "Onboarding", "Management"],
+    "realWorldContext": "Google's 'Noogler' onboarding program is a benchmark — structured, buddy-based, with clear milestones for the first 90 days."
+  },
+  {
+    "id": "em-008", "roleId": "engineering-manager", "category": "behavioral", "difficulty": "hard",
+    "question": "How do you make a case to leadership for additional headcount?",
+    "answer": "Framework: 1) Quantify the gap — what work is not getting done? What is the business impact? 2) Show current team utilization — are people overloaded? What is being deprioritized? 3) ROI calculation — what revenue/cost savings does the new hire enable? 4) Alternatives considered — could we automate, outsource, or reprioritize instead? 5) Hiring plan — what role, what level, what timeline? 6) Risk of not hiring — what happens if we don't? Present data, not feelings. Tie to business outcomes.",
+    "explanation": "Headcount requests fail when they're vague ('we're busy') instead of specific ('we're missing $2M in revenue because we can't build feature X'). Business impact is the language leadership speaks.",
+    "followUpQuestions": ["How do you handle headcount being denied?", "How do you prioritize which role to hire for first?"],
+    "keyConcepts": ["Headcount Planning", "Business Case", "ROI", "Stakeholder Management"],
+    "tags": ["Leadership", "Management", "Business Case"],
+    "realWorldContext": "Engineering managers at Amazon are expected to write 6-pagers justifying headcount with quantified business impact."
+  },
+  {
+    "id": "sa-001", "roleId": "solution-architect", "category": "technical", "difficulty": "hard",
+    "question": "How do you approach technology selection for a new platform? What is your evaluation framework?",
+    "answer": "Framework: 1) Requirements: functional (what it must do), non-functional (scale, latency, availability), constraints (budget, team skills, compliance). 2) Candidate identification: industry standards, team familiarity, vendor support. 3) Evaluation criteria: technical fit, operational maturity, community/support, total cost of ownership, vendor lock-in risk, team learning curve. 4) Proof of concept: test top 2-3 candidates against real requirements. 5) Decision matrix: score each option against weighted criteria. 6) Document decision (ADR) with context and tradeoffs. 7) Revisit in 12-18 months.",
+    "explanation": "Technology selection is a decision with long-term consequences. The PoC is critical — paper evaluations miss real-world integration challenges. Document the decision so future engineers understand why.",
+    "followUpQuestions": ["How do you handle a team that wants to use a technology you think is wrong?", "How do you evaluate build vs buy decisions?"],
+    "keyConcepts": ["Technology Selection", "ADR", "Proof of Concept", "Decision Framework"],
+    "tags": ["Solution Architecture", "Technology Strategy", "Decision Making"],
+    "realWorldContext": "ThoughtWorks Technology Radar is a widely-used framework for technology assessment and adoption decisions."
+  },
+  {
+    "id": "sa-002", "roleId": "solution-architect", "category": "system-design", "difficulty": "expert",
+    "question": "How do you design an enterprise integration architecture connecting 20+ legacy systems?",
+    "answer": "Pattern: Enterprise Service Bus (ESB) or modern event-driven integration. Modern approach: 1) API Gateway as integration facade — expose clean APIs over legacy systems. 2) Event broker (Kafka) for async integration — systems publish events, consumers subscribe. 3) ETL/ELT for data integration — Airbyte/Fivetran for data sync. 4) Strangler fig for legacy modernization — incrementally replace legacy with new services. 5) API management (Kong, Apigee) for governance, security, rate limiting. 6) Data mesh for domain-owned data products. Key principles: loose coupling, contract-first APIs, versioning strategy, circuit breakers for resilience.",
+    "explanation": "Point-to-point integration between 20 systems creates O(n²) complexity. An event broker or API gateway reduces this to O(n). The strangler fig pattern enables incremental modernization without big-bang rewrites.",
+    "followUpQuestions": ["How do you handle data consistency across 20 integrated systems?", "How do you manage API versioning across a large enterprise?"],
+    "keyConcepts": ["Enterprise Integration", "Event-Driven Architecture", "API Gateway", "Strangler Fig"],
+    "tags": ["Solution Architecture", "Enterprise Integration", "Legacy Modernization"],
+    "realWorldContext": "Large banks have 100+ legacy systems — modern integration platforms like MuleSoft and Confluent are used to connect them without replacing them."
+  },
+  {
+    "id": "sa-003", "roleId": "solution-architect", "category": "behavioral", "difficulty": "hard",
+    "question": "How do you manage stakeholder expectations when a project is behind schedule?",
+    "answer": "Principles: 1) Communicate early — don't wait until the deadline to say you'll miss it. 2) Come with options, not just problems: a) reduce scope to hit date, b) extend timeline, c) add resources (rarely effective). 3) Quantify the impact of each option. 4) Be honest about root cause — was it poor estimation, scope creep, technical complexity? 5) Propose a recovery plan with milestones. 6) Increase communication frequency during recovery. 7) Do a retrospective after delivery to prevent recurrence. Never surprise stakeholders.",
+    "explanation": "Stakeholders can handle bad news if they get it early with options. What they can't handle is surprises at the deadline. Early communication preserves trust; late communication destroys it.",
+    "followUpQuestions": ["How do you handle a stakeholder who insists on the original date despite the constraints?", "How do you improve estimation accuracy?"],
+    "keyConcepts": ["Stakeholder Management", "Communication", "Expectation Setting", "Risk Management"],
+    "tags": ["Leadership", "Stakeholder Management", "Communication"],
+    "realWorldContext": "Project delays are universal — the differentiator is how they're communicated. Amazon's 'disagree and commit' culture requires honest communication about risks."
+  },
+  {
+    "id": "sa-004", "roleId": "solution-architect", "category": "technical", "difficulty": "expert",
+    "question": "How do you design for scalability from day one without over-engineering?",
+    "answer": "Principles: 1) Design for 10x current scale, not 1000x — over-engineering for unlikely scale is waste. 2) Identify the bottleneck — usually database, not application servers. 3) Stateless application tier — enables horizontal scaling. 4) Async where possible — decouple with queues. 5) Cache aggressively — most reads can be cached. 6) Design for observability — you can't optimize what you can't measure. 7) Use managed services — don't build what AWS/GCP provides. 8) Avoid premature optimization — profile first. YAGNI (You Aren't Gonna Need It) for speculative features.",
+    "explanation": "The biggest scalability mistake is premature optimization. Most startups that fail don't fail because they couldn't scale — they fail because they spent too much time on scalability instead of product-market fit.",
+    "followUpQuestions": ["How do you know when to start optimizing for scale?", "What are the signs that your architecture won't scale?"],
+    "keyConcepts": ["Scalability", "YAGNI", "Stateless Design", "Premature Optimization"],
+    "tags": ["Solution Architecture", "Scalability", "Design Principles"],
+    "realWorldContext": "Instagram scaled to 1B users with a small team by using PostgreSQL, Redis, and Django — simple, proven technologies rather than complex distributed systems."
+  },
+  {
+    "id": "sa-005", "roleId": "solution-architect", "category": "behavioral", "difficulty": "hard",
+    "question": "How do you conduct an architecture review for a system built by another team?",
+    "answer": "Process: 1) Preparation: understand business context, SLAs, compliance requirements before the review. 2) Review meeting: ask questions, don't lecture. 'Help me understand why...' not 'You should have...'. 3) Document findings: categorize as critical (must fix), important (should fix), suggestions (nice to have). 4) Prioritize by risk and impact. 5) Provide actionable recommendations, not just problems. 6) Follow up: schedule check-in to see if recommendations were addressed. 7) Be collaborative — the goal is to help, not to judge. Avoid: nitpicking style preferences, imposing your preferred technology.",
+    "explanation": "Architecture reviews are most effective when they're collaborative, not adversarial. Teams that feel judged become defensive and dismiss valid feedback. The goal is shared understanding and improvement.",
+    "followUpQuestions": ["How do you handle a team that is defensive about their architecture?", "How do you balance thoroughness with not overwhelming the team?"],
+    "keyConcepts": ["Architecture Review", "Collaboration", "Feedback", "Risk Assessment"],
+    "tags": ["Solution Architecture", "Leadership", "Communication"],
+    "realWorldContext": "AWS Solution Architects conduct Well-Architected Reviews as collaborative workshops, not audits — this approach gets better outcomes."
+  },
+  {
+    "id": "sa-006", "roleId": "solution-architect", "category": "technical", "difficulty": "expert",
+    "question": "How do you design a migration strategy for moving a monolith to microservices?",
+    "answer": "Strategy: Strangler Fig pattern — incrementally extract services. Steps: 1) Identify bounded contexts (DDD) — natural service boundaries. 2) Start with least-coupled, highest-value modules. 3) Extract data first or together with service (avoid shared database). 4) Use API gateway to route traffic — gradually shift from monolith to new service. 5) Run both in parallel during transition. 6) Decommission monolith module after service is stable. Anti-patterns: big-bang rewrite (high risk), distributed monolith (microservices with shared DB), extracting too many services too fast. Timeline: 2-3 years for large monoliths.",
+    "explanation": "The distributed monolith is the most common microservices failure — services that are independently deployed but share a database. True microservices require data isolation.",
+    "followUpQuestions": ["How do you handle the shared database anti-pattern?", "How do you decide which services to extract first?"],
+    "keyConcepts": ["Strangler Fig", "Microservices", "DDD", "Migration Strategy"],
+    "tags": ["Solution Architecture", "Microservices", "Migration"],
+    "realWorldContext": "Amazon's migration from monolith to microservices took 5+ years and is the canonical example of successful incremental migration."
+  },
+  {
+    "id": "sa-007", "roleId": "solution-architect", "category": "behavioral", "difficulty": "expert",
+    "question": "How do you present a technical architecture to a non-technical executive audience?",
+    "answer": "Principles: 1) Lead with business outcomes, not technology. 'This reduces downtime by 99.9%' not 'We're using Kubernetes'. 2) Use analogies — 'Think of it like a city's road network'. 3) Focus on risks and mitigations, not implementation details. 4) Quantify: cost, time, risk reduction, revenue impact. 5) Use visuals — architecture diagrams at the right level of abstraction. 6) Anticipate questions: cost, timeline, risk, alternatives considered. 7) Have a one-page summary and detailed appendix. 8) Practice with a non-technical colleague first.",
+    "explanation": "Executives make decisions based on business impact, risk, and cost — not technical elegance. The ability to translate technical decisions into business language is a critical senior architect skill.",
+    "followUpQuestions": ["How do you handle an executive who wants to make a technical decision based on incomplete information?", "How do you explain technical debt to a CFO?"],
+    "keyConcepts": ["Executive Communication", "Business Value", "Stakeholder Management"],
+    "tags": ["Leadership", "Communication", "Solution Architecture"],
+    "realWorldContext": "CTO presentations to boards of directors require translating complex technical strategies into business risk and opportunity language."
+  },
+  {
+    "id": "sa-008", "roleId": "solution-architect", "category": "technical", "difficulty": "hard",
+    "question": "What is domain-driven design (DDD) and how do you apply it to microservices architecture?",
+    "answer": "DDD: model software around business domains. Key concepts: Bounded Context — explicit boundary where a domain model applies (maps to microservice boundary). Ubiquitous Language — shared vocabulary between developers and domain experts. Aggregate — cluster of domain objects treated as a unit (transaction boundary). Domain Events — significant business occurrences. Context Map — relationships between bounded contexts. Application to microservices: each bounded context = one microservice. Aggregates define transaction boundaries (don't span services). Domain events enable loose coupling between services. Anti-corruption layer for legacy integration.",
+    "explanation": "DDD's bounded contexts are the most practical tool for microservices decomposition. Services aligned with business domains are more stable than services aligned with technical layers.",
+    "followUpQuestions": ["How do you identify bounded contexts in a complex domain?", "What is the difference between an aggregate and an entity?"],
+    "keyConcepts": ["DDD", "Bounded Context", "Aggregate", "Domain Events", "Ubiquitous Language"],
+    "tags": ["Solution Architecture", "DDD", "Microservices"],
+    "realWorldContext": "Vaughn Vernon's 'Implementing Domain-Driven Design' is the standard reference. Companies like Zalando use DDD for their microservices decomposition."
+  }
+]

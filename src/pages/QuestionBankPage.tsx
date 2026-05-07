@@ -48,33 +48,67 @@ function QuestionCard({ q }: { q: Question }) {
         </button>
       </div>
 
-      {q.hints && (
+      {(q.answer || q.hints) && (
         <button
           onClick={() => setExpanded(!expanded)}
           className="mt-3 text-xs text-cyber-blue hover:text-cyber-cyan transition-colors"
         >
-          {expanded ? '▲ Hide hints' : '▼ Show hints & answer'}
+          {expanded ? '▲ Hide answer' : '▼ Show answer & explanation'}
         </button>
       )}
 
       {expanded && (
         <div className="mt-3 space-y-3 animate-fade-in">
+          {/* Best Answer */}
+          {(q.answer || q.sampleAnswer) && (
+            <div className="bg-cyber-green/5 border border-cyber-green/20 rounded-lg p-3">
+              <div className="text-xs font-semibold text-cyber-green mb-1.5">✅ Best Answer</div>
+              <p className="text-xs text-cyber-text leading-relaxed">{q.answer ?? q.sampleAnswer}</p>
+            </div>
+          )}
+          {/* Explanation */}
+          {q.explanation && (
+            <div className="bg-cyber-blue/5 border border-cyber-blue/20 rounded-lg p-3">
+              <div className="text-xs font-semibold text-cyber-blue mb-1.5">💡 Explanation</div>
+              <p className="text-xs text-cyber-muted leading-relaxed">{q.explanation}</p>
+            </div>
+          )}
+          {/* Hints (legacy) */}
           {q.hints && (
             <div className="bg-cyber-blue/5 border border-cyber-blue/20 rounded-lg p-3">
               <div className="text-xs font-semibold text-cyber-blue mb-1.5">💡 Hints</div>
               <ul className="space-y-1">
                 {q.hints.map((h, i) => (
-                  <li key={i} className="text-xs text-cyber-muted flex gap-2">
-                    <span className="text-cyber-blue">→</span>{h}
-                  </li>
+                  <li key={i} className="text-xs text-cyber-muted flex gap-2"><span className="text-cyber-blue">→</span>{h}</li>
                 ))}
               </ul>
             </div>
           )}
-          {q.sampleAnswer && (
-            <div className="bg-cyber-green/5 border border-cyber-green/20 rounded-lg p-3">
-              <div className="text-xs font-semibold text-cyber-green mb-1.5">✅ Sample Answer</div>
-              <p className="text-xs text-cyber-muted leading-relaxed">{q.sampleAnswer}</p>
+          {/* Real World Context */}
+          {q.realWorldContext && (
+            <div className="bg-cyber-purple/5 border border-cyber-purple/20 rounded-lg p-3">
+              <div className="text-xs font-semibold text-cyber-purple mb-1.5">🏢 Real-World Context</div>
+              <p className="text-xs text-cyber-muted leading-relaxed">{q.realWorldContext}</p>
+            </div>
+          )}
+          {/* Key Concepts */}
+          {q.keyConcepts && q.keyConcepts.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              <span className="text-xs text-cyber-muted">Key concepts:</span>
+              {q.keyConcepts.map((c) => (
+                <span key={c} className="badge-blue text-[10px]">{c}</span>
+              ))}
+            </div>
+          )}
+          {/* Follow-up Questions */}
+          {q.followUpQuestions && q.followUpQuestions.length > 0 && (
+            <div className="bg-cyber-yellow/5 border border-cyber-yellow/20 rounded-lg p-3">
+              <div className="text-xs font-semibold text-cyber-yellow mb-1.5">🔄 Follow-up Questions</div>
+              <ul className="space-y-1">
+                {q.followUpQuestions.map((fq, i) => (
+                  <li key={i} className="text-xs text-cyber-muted flex gap-2"><span className="text-cyber-yellow">→</span>{fq}</li>
+                ))}
+              </ul>
             </div>
           )}
         </div>

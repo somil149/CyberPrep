@@ -1,0 +1,513 @@
+[
+  {
+    "id": "de-001",
+    "roleId": "data-engineer",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain the medallion architecture (Bronze/Silver/Gold) in a data lake. What transformations happen at each layer?",
+    "answer": "Bronze (Raw): exact copy of source data, immutable, append-only. No transformations. Preserves raw data for reprocessing. Silver (Cleansed): deduplicated, validated, standardized schemas, null handling, type casting. Joins across sources. Gold (Curated): business-level aggregations, denormalized for consumption, optimized for specific use cases (BI, ML features, reporting). Tools: Delta Lake/Iceberg for ACID transactions across layers. Each layer stored in S3/ADLS as Parquet. Lineage tracked between layers.",
+    "explanation": "The medallion architecture enables reprocessing — if business logic changes, reprocess Silver→Gold without re-ingesting from source. Bronze is the source of truth for raw data.",
+    "followUpQuestions": [
+      "How do you handle late-arriving data in the medallion architecture?",
+      "When would you add a Platinum layer?"
+    ],
+    "keyConcepts": [
+      "Medallion Architecture",
+      "Data Lake",
+      "Delta Lake",
+      "Data Quality"
+    ],
+    "tags": [
+      "Data Engineering",
+      "Data Lake",
+      "Architecture"
+    ],
+    "realWorldContext": "Databricks invented the medallion architecture and it's now the standard for data lake design at companies like Comcast and Shell."
+  },
+  {
+    "id": "de-002",
+    "roleId": "data-engineer",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What is Apache Kafka and how does it differ from traditional message queues like RabbitMQ?",
+    "answer": "Kafka: distributed log, messages persisted to disk (configurable retention), consumers maintain their own offset (can replay), partitioned for parallelism, high throughput (millions/sec). RabbitMQ: traditional message broker, messages deleted after consumption, broker tracks consumer state, supports complex routing (exchanges, bindings), lower throughput. Key differences: Kafka retains messages (replay capability), consumers are stateless (offset in Kafka), better for event streaming and audit logs. RabbitMQ better for: task queues, complex routing, request-reply patterns. Kafka use cases: event streaming, CDC, log aggregation, real-time analytics.",
+    "explanation": "Kafka's log retention is its superpower — multiple consumers can independently read the same data at different offsets. This enables replay, backfill, and adding new consumers without affecting existing ones.",
+    "followUpQuestions": [
+      "How does Kafka achieve high throughput?",
+      "What is Kafka Streams vs Kafka Connect?"
+    ],
+    "keyConcepts": [
+      "Kafka",
+      "Message Queue",
+      "Event Streaming",
+      "Consumer Groups"
+    ],
+    "tags": [
+      "Data Engineering",
+      "Kafka",
+      "Streaming"
+    ],
+    "realWorldContext": "LinkedIn (Kafka's creator) processes 7 trillion messages/day. Netflix uses Kafka for real-time event processing across all microservices."
+  },
+  {
+    "id": "de-003",
+    "roleId": "data-engineer",
+    "category": "system-design",
+    "difficulty": "expert",
+    "question": "Design a real-time data pipeline processing 1M events/second with exactly-once semantics.",
+    "answer": "Ingestion: Kafka with 100 partitions (10K events/sec/partition). Processing: Apache Flink with exactly-once via checkpointing (Flink writes state to S3 every 30s, uses Kafka transactions for source/sink). Idempotent sink: write to Delta Lake with transaction IDs, deduplicate on upsert. Checkpointing: Flink saves operator state to S3, on failure restores from last checkpoint and replays Kafka from saved offset. End-to-end exactly-once: Kafka transactions + Flink checkpointing + idempotent sink. Monitoring: Flink metrics (checkpoint duration, lag), Kafka consumer lag.",
+    "explanation": "Exactly-once is expensive — it requires coordination between source, processor, and sink. At-least-once with idempotent consumers is often sufficient and much simpler.",
+    "followUpQuestions": [
+      "What is the difference between at-least-once and exactly-once processing?",
+      "How do Flink checkpoints work?"
+    ],
+    "keyConcepts": [
+      "Exactly-Once",
+      "Flink",
+      "Kafka",
+      "Checkpointing"
+    ],
+    "tags": [
+      "Data Engineering",
+      "Streaming",
+      "Flink",
+      "Kafka"
+    ],
+    "realWorldContext": "Uber's real-time pricing engine uses Flink with exactly-once semantics to ensure fare calculations are never duplicated."
+  },
+  {
+    "id": "de-004",
+    "roleId": "data-engineer",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What is dbt (data build tool) and how does it change the data transformation workflow?",
+    "answer": "dbt: SQL-first transformation tool. Write SELECT statements, dbt handles CREATE TABLE/VIEW. Features: dependency graph (ref() function), testing (not_null, unique, custom), documentation generation, incremental models, snapshots for SCD Type 2, macros (Jinja templating), packages. Workflow: analysts write SQL models, dbt compiles to warehouse SQL, runs in dependency order. Replaces stored procedures and custom ETL scripts. Works with: Snowflake, BigQuery, Redshift, DuckDB. dbt Cloud: managed orchestration. Benefits: version control for transformations, CI/CD for data, self-documenting.",
+    "explanation": "dbt democratizes data transformation — analysts write SQL, dbt handles orchestration and testing. The ref() function creates a DAG of dependencies, enabling incremental builds.",
+    "followUpQuestions": [
+      "How do you implement incremental models in dbt?",
+      "How do you test data quality in dbt?"
+    ],
+    "keyConcepts": [
+      "dbt",
+      "Data Transformation",
+      "SQL",
+      "DAG",
+      "Data Testing"
+    ],
+    "tags": [
+      "Data Engineering",
+      "dbt",
+      "Analytics Engineering"
+    ],
+    "realWorldContext": "Airbnb, GitLab, and JetBlue use dbt for their analytics engineering workflows, replacing thousands of lines of stored procedures."
+  },
+  {
+    "id": "de-005",
+    "roleId": "data-engineer",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "Explain Apache Spark's execution model. What is the difference between transformations and actions?",
+    "answer": "Spark execution: lazy evaluation — transformations build a DAG, actions trigger execution. Transformations (lazy): map, filter, groupBy, join — return new RDD/DataFrame, not executed immediately. Actions (eager): collect, count, write, show — trigger DAG execution. Execution plan: logical plan → optimized logical plan (Catalyst optimizer) → physical plan → execution. Partitioning: data split across executors, each partition processed in parallel. Shuffle: expensive operation (groupBy, join) — data moved across network. Persist/cache: store intermediate results to avoid recomputation. Wide vs narrow transformations: narrow (map, filter) — no shuffle. Wide (groupBy, join) — shuffle.",
+    "explanation": "Lazy evaluation enables Catalyst optimizer to reorder and optimize the entire query plan before execution. Understanding shuffles is key to Spark performance — minimize wide transformations.",
+    "followUpQuestions": [
+      "How do you optimize a Spark job with skewed data?",
+      "What is the difference between persist() and cache()?"
+    ],
+    "keyConcepts": [
+      "Spark",
+      "Lazy Evaluation",
+      "DAG",
+      "Shuffle",
+      "Catalyst Optimizer"
+    ],
+    "tags": [
+      "Data Engineering",
+      "Spark",
+      "Distributed Computing"
+    ],
+    "realWorldContext": "Netflix processes petabytes of viewing data daily with Spark for recommendation model training and content analytics."
+  },
+  {
+    "id": "de-006",
+    "roleId": "data-engineer",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is Change Data Capture (CDC) and how do you implement it?",
+    "answer": "CDC: capture row-level changes (INSERT/UPDATE/DELETE) from source database and stream them downstream. Methods: 1) Log-based CDC (preferred): read database transaction log (PostgreSQL WAL, MySQL binlog). Tools: Debezium, AWS DMS. Low overhead, captures all changes. 2) Trigger-based: DB triggers write changes to audit table. High overhead. 3) Timestamp-based: poll for rows WHERE updated_at > last_run. Misses deletes. Use cases: real-time data sync, event sourcing, cache invalidation, data lake ingestion. Debezium → Kafka → Flink/Spark → data lake is the standard pattern.",
+    "explanation": "Log-based CDC is the gold standard — it has minimal impact on source database performance and captures all changes including deletes. Debezium is the most widely used open-source CDC tool.",
+    "followUpQuestions": [
+      "How do you handle schema changes in CDC pipelines?",
+      "What is the difference between CDC and ETL?"
+    ],
+    "keyConcepts": [
+      "CDC",
+      "Debezium",
+      "WAL",
+      "Real-time Sync"
+    ],
+    "tags": [
+      "Data Engineering",
+      "CDC",
+      "Debezium",
+      "Kafka"
+    ],
+    "realWorldContext": "LinkedIn uses Debezium for CDC from their production databases to their data lake, processing billions of change events daily."
+  },
+  {
+    "id": "de-007",
+    "roleId": "data-engineer",
+    "category": "system-design",
+    "difficulty": "hard",
+    "question": "Design a data pipeline for ingesting data from 100 different source systems into a central data lake.",
+    "answer": "Ingestion layer: Airbyte or Fivetran for SaaS sources (Salesforce, HubSpot), Debezium for databases, Kafka Connect for streaming sources, custom connectors for proprietary systems. Landing zone: S3 raw bucket, partitioned by source/date. Schema registry: Glue Schema Registry or Confluent Schema Registry for schema evolution. Orchestration: Apache Airflow or Prefect for batch pipelines, Kafka for streaming. Monitoring: pipeline health dashboard, data freshness SLAs, anomaly detection on row counts. Metadata: OpenMetadata or DataHub for data catalog. Error handling: DLQ for failed records, alerting on pipeline failures.",
+    "explanation": "Managed connectors (Airbyte/Fivetran) handle the long tail of SaaS integrations. Custom connectors are only justified for high-volume or proprietary sources. Data catalog is essential at 100+ sources.",
+    "followUpQuestions": [
+      "How do you handle schema evolution across 100 sources?",
+      "How do you implement data quality checks at ingestion?"
+    ],
+    "keyConcepts": [
+      "Data Ingestion",
+      "Airbyte",
+      "Airflow",
+      "Data Catalog",
+      "Schema Registry"
+    ],
+    "tags": [
+      "Data Engineering",
+      "Data Lake",
+      "Ingestion",
+      "Architecture"
+    ],
+    "realWorldContext": "Spotify ingests data from 200+ internal and external sources into their data platform using a combination of Kafka and batch pipelines."
+  },
+  {
+    "id": "de-008",
+    "roleId": "data-engineer",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What is data partitioning in distributed systems? How do you choose partition keys?",
+    "answer": "Partitioning: divide data across nodes/files for parallel processing. Types: Range partitioning (date ranges — good for time-series queries), Hash partitioning (even distribution — good for point lookups), List partitioning (categorical values). Partition key selection: 1) High cardinality for even distribution. 2) Aligned with query patterns (filter on partition key = partition pruning). 3) Avoid hot partitions (e.g., don't partition by status if 90% are 'active'). In Kafka: partition key determines which partition a message goes to — use entity ID for ordering guarantees. In S3/data lake: partition by date for time-range queries, by region for geo queries.",
+    "explanation": "Partition pruning is the key benefit — queries that filter on the partition key skip irrelevant partitions entirely. A query on date-partitioned data for 'last 7 days' reads 7 partitions instead of all data.",
+    "followUpQuestions": [
+      "How do you handle data skew in partitioned datasets?",
+      "What is dynamic partitioning in Spark?"
+    ],
+    "keyConcepts": [
+      "Partitioning",
+      "Partition Pruning",
+      "Data Skew",
+      "Kafka Partitions"
+    ],
+    "tags": [
+      "Data Engineering",
+      "Partitioning",
+      "Spark",
+      "Kafka"
+    ],
+    "realWorldContext": "Uber's trip data is partitioned by city and date — queries for a specific city's trips for a week read a tiny fraction of total data."
+  },
+  {
+    "id": "de-009",
+    "roleId": "data-engineer",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is Apache Airflow and how do you design reliable DAGs?",
+    "answer": "Airflow: workflow orchestration platform. DAG: Directed Acyclic Graph of tasks. Operators: PythonOperator, BashOperator, SparkSubmitOperator, S3ToRedshiftOperator. Best practices: 1) Idempotent tasks — re-running produces same result. 2) Atomic tasks — each task does one thing. 3) Use XComs sparingly (small data only). 4) Set retries and retry_delay. 5) Use sensors for external dependencies. 6) Avoid dynamic DAGs (hard to debug). 7) Use task groups for organization. 8) Set SLAs and email alerts. Common pitfalls: large XComs, non-idempotent tasks, missing dependencies, scheduler overload.",
+    "explanation": "Idempotency is the most important DAG design principle — if a task fails and retries, it should produce the same result. This requires tasks to check if work is already done before doing it.",
+    "followUpQuestions": [
+      "How do you handle backfilling in Airflow?",
+      "What is the difference between Airflow and Prefect?"
+    ],
+    "keyConcepts": [
+      "Airflow",
+      "DAG",
+      "Idempotency",
+      "Workflow Orchestration"
+    ],
+    "tags": [
+      "Data Engineering",
+      "Airflow",
+      "Orchestration"
+    ],
+    "realWorldContext": "Airbnb created Airflow and open-sourced it. It's now used by thousands of companies for data pipeline orchestration."
+  },
+  {
+    "id": "de-010",
+    "roleId": "data-engineer",
+    "category": "behavioral",
+    "difficulty": "medium",
+    "question": "How do you handle a situation where a critical data pipeline fails in production and downstream teams are blocked?",
+    "answer": "Immediate: 1) Assess impact — which teams/reports are blocked, what is the business impact? 2) Communicate immediately — notify stakeholders with ETA, don't wait until fixed. 3) Check monitoring — what failed, when, error logs. 4) Quick fix vs proper fix — can you manually trigger a partial run to unblock critical reports? Resolution: fix root cause, validate data quality after fix, document incident. Post-mortem: root cause analysis, add monitoring/alerting to detect earlier, improve pipeline resilience (retries, DLQ). Never silently fail — always alert on pipeline failures.",
+    "explanation": "Communication is as important as the technical fix. Stakeholders need to know what's broken and when it will be fixed so they can make decisions (delay reports, use cached data, etc.).",
+    "followUpQuestions": [
+      "How do you implement data pipeline monitoring and alerting?",
+      "How do you design pipelines to be self-healing?"
+    ],
+    "keyConcepts": [
+      "Incident Response",
+      "Communication",
+      "Data Pipeline Reliability"
+    ],
+    "tags": [
+      "Behavioral",
+      "Data Engineering",
+      "Reliability"
+    ],
+    "realWorldContext": "Data pipeline failures that block executive dashboards are high-visibility incidents — clear communication is critical."
+  },
+  {
+    "id": "ml-001",
+    "roleId": "ml-engineer",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What is MLOps and what are the key components of a mature ML platform?",
+    "answer": "MLOps: DevOps practices applied to ML lifecycle. Key components: 1) Feature Store: centralized feature computation and serving (online/offline). Feast, Tecton, SageMaker Feature Store. 2) Experiment Tracking: MLflow, W&B — log metrics, params, artifacts. 3) Model Registry: versioned model storage, stage transitions (staging→production). 4) Training Pipelines: reproducible, parameterized training. Kubeflow, SageMaker Pipelines. 5) Model Serving: real-time (SageMaker, Triton), batch (Spark). 6) Monitoring: data drift, model drift, prediction quality. 7) CI/CD for ML: automated retraining triggers, A/B testing.",
+    "explanation": "The feature store is the most impactful MLOps investment — it ensures training/serving consistency (no training-serving skew) and enables feature reuse across models.",
+    "followUpQuestions": [
+      "What is training-serving skew and how do you prevent it?",
+      "How do you implement A/B testing for ML models?"
+    ],
+    "keyConcepts": [
+      "MLOps",
+      "Feature Store",
+      "Model Registry",
+      "Experiment Tracking"
+    ],
+    "tags": [
+      "ML Engineering",
+      "MLOps",
+      "Platform"
+    ],
+    "realWorldContext": "Uber's Michelangelo ML platform pioneered the feature store concept. Netflix's Metaflow and Airbnb's Bighead are similar internal platforms."
+  },
+  {
+    "id": "ml-002",
+    "roleId": "ml-engineer",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you detect and handle model drift in production?",
+    "answer": "Types: Data drift (input distribution changes), concept drift (relationship between features and target changes), prediction drift (output distribution changes). Detection: 1) Statistical tests: KS test, PSI (Population Stability Index) for feature distributions. 2) Model performance monitoring: track accuracy, AUC, F1 on labeled production data. 3) Proxy metrics: business KPIs correlated with model quality. Tools: Evidently AI, WhyLabs, SageMaker Model Monitor. Response: alert → investigate → retrain if drift confirmed. Scheduled retraining vs triggered retraining. Shadow mode: run new model alongside old, compare predictions.",
+    "explanation": "Data drift is detectable without labels (compare input distributions). Concept drift requires labels — harder to detect quickly. PSI >0.2 is the standard threshold for significant drift.",
+    "followUpQuestions": [
+      "How do you set up automated retraining pipelines?",
+      "What is the difference between online and offline model evaluation?"
+    ],
+    "keyConcepts": [
+      "Model Drift",
+      "Data Drift",
+      "PSI",
+      "Model Monitoring"
+    ],
+    "tags": [
+      "ML Engineering",
+      "MLOps",
+      "Model Monitoring"
+    ],
+    "realWorldContext": "Credit scoring models drift significantly during economic shocks (COVID-19 caused massive drift in all financial ML models in 2020)."
+  },
+  {
+    "id": "ml-003",
+    "roleId": "ml-engineer",
+    "category": "system-design",
+    "difficulty": "expert",
+    "question": "Design a feature store for a recommendation system serving 100M users.",
+    "answer": "Offline store: S3 + Delta Lake for historical features, computed by Spark jobs. Online store: Redis Cluster for low-latency serving (<5ms). Feature pipeline: Spark/Flink computes features → writes to both stores. Point-in-time correct joins: offline store supports time-travel queries for training (no data leakage). Feature serving API: gRPC service reads from Redis, fallback to DynamoDB. Feature registry: metadata store (feature name, owner, description, schema, lineage). Backfill: compute historical features for new feature definitions. Monitoring: feature freshness, null rates, distribution drift per feature.",
+    "explanation": "Point-in-time correctness is the hardest part — training data must use feature values as they existed at prediction time, not current values. This prevents data leakage and ensures training/serving consistency.",
+    "followUpQuestions": [
+      "How do you handle feature backfilling for a new feature?",
+      "How do you implement point-in-time correct joins?"
+    ],
+    "keyConcepts": [
+      "Feature Store",
+      "Online/Offline Store",
+      "Point-in-time Correctness",
+      "Redis"
+    ],
+    "tags": [
+      "ML Engineering",
+      "Feature Store",
+      "Recommendation System"
+    ],
+    "realWorldContext": "Spotify's feature store serves features for their recommendation models to 400M+ users with sub-10ms latency."
+  },
+  {
+    "id": "ml-004",
+    "roleId": "ml-engineer",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you optimize model inference latency for a production ML service?",
+    "answer": "Model optimization: 1) Quantization: INT8/FP16 reduces model size and speeds inference (2-4x). 2) Pruning: remove low-importance weights. 3) Knowledge distillation: train smaller student model from large teacher. 4) ONNX: convert to optimized runtime. 5) TensorRT: NVIDIA GPU optimization. Serving optimization: 1) Batching: group requests for GPU efficiency. 2) Caching: cache predictions for repeated inputs. 3) Async inference: non-blocking API. 4) Model parallelism for large models. Infrastructure: GPU instances (g4dn, p3), Triton Inference Server for multi-model serving. Target: <100ms p99 for user-facing models.",
+    "explanation": "Quantization is the highest-impact optimization — INT8 inference is 2-4x faster than FP32 with minimal accuracy loss for most models. Always profile before optimizing.",
+    "followUpQuestions": [
+      "What is the accuracy-latency tradeoff in model quantization?",
+      "How do you implement dynamic batching in Triton?"
+    ],
+    "keyConcepts": [
+      "Model Optimization",
+      "Quantization",
+      "TensorRT",
+      "Inference Latency"
+    ],
+    "tags": [
+      "ML Engineering",
+      "Inference",
+      "Performance",
+      "GPU"
+    ],
+    "realWorldContext": "OpenAI uses quantization and custom CUDA kernels to serve GPT models at scale while meeting latency SLAs."
+  },
+  {
+    "id": "ml-005",
+    "roleId": "ml-engineer",
+    "category": "technical",
+    "difficulty": "medium",
+    "question": "What is the difference between batch inference and real-time inference? When do you use each?",
+    "answer": "Batch inference: process large datasets offline, results stored for later use. High throughput, latency-insensitive. Use for: pre-computed recommendations, risk scoring for all users nightly, document classification. Tools: Spark MLlib, SageMaker Batch Transform. Real-time inference: single prediction on demand, low latency required. Use for: fraud detection (must decide before transaction completes), search ranking, dynamic pricing. Tools: SageMaker real-time endpoints, Triton, FastAPI. Near-real-time: streaming inference with Flink/Kafka Streams. Hybrid: pre-compute for most users (batch), real-time for new users or time-sensitive features.",
+    "explanation": "Most ML use cases are batch — pre-compute predictions for all users nightly and serve from a lookup table. Real-time inference is only needed when predictions must be fresh at request time.",
+    "followUpQuestions": [
+      "How do you handle cold start for new users in a batch inference system?",
+      "What is streaming inference and when do you use it?"
+    ],
+    "keyConcepts": [
+      "Batch Inference",
+      "Real-time Inference",
+      "SageMaker",
+      "Latency"
+    ],
+    "tags": [
+      "ML Engineering",
+      "Inference",
+      "Architecture"
+    ],
+    "realWorldContext": "Netflix pre-computes recommendations for all users nightly (batch) but uses real-time inference for search ranking and homepage personalization."
+  },
+  {
+    "id": "sre-001",
+    "roleId": "platform-sre",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "What are SLOs, SLIs, and SLAs? How do you define them for a payment processing service?",
+    "answer": "SLI (Service Level Indicator): metric measuring service behavior. SLO (Service Level Objective): target value for SLI. SLA (Service Level Agreement): contractual commitment with consequences. For payment service: SLI: success rate = successful_payments / total_payments. SLO: 99.95% success rate over 30 days. SLI: latency = p99 < 500ms. SLO: 99% of payments complete in <500ms. Error budget: 100% - 99.95% = 0.05% = 21.6 minutes/month downtime allowed. When error budget exhausted: freeze feature deployments, focus on reliability. SLA: typically 99.9% with financial penalties.",
+    "explanation": "Error budgets are the key innovation — they give teams a quantified allowance for unreliability, enabling data-driven decisions about when to ship features vs focus on reliability.",
+    "followUpQuestions": [
+      "How do you handle error budget exhaustion?",
+      "What is the difference between availability and reliability?"
+    ],
+    "keyConcepts": [
+      "SLO",
+      "SLI",
+      "SLA",
+      "Error Budget",
+      "Reliability"
+    ],
+    "tags": [
+      "SRE",
+      "Reliability",
+      "Observability"
+    ],
+    "realWorldContext": "Google's SRE book introduced SLOs and error budgets. Stripe and Stripe's payment SLAs are contractually binding with financial penalties."
+  },
+  {
+    "id": "sre-002",
+    "roleId": "platform-sre",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement observability in a Kubernetes environment?",
+    "answer": "Metrics: Prometheus scrapes metrics from pods (via /metrics endpoint), Grafana for dashboards. kube-state-metrics for cluster state. Node Exporter for node metrics. Logs: Fluentd/Fluent Bit as DaemonSet, ships to Elasticsearch (EFK stack) or CloudWatch/Datadog. Structured JSON logging. Traces: Jaeger or Zipkin for distributed tracing, OpenTelemetry for instrumentation. Alerting: Prometheus AlertManager, PagerDuty integration. Key metrics: pod restart count, CPU/memory requests vs limits, HPA scaling events, node pressure. Dashboards: cluster overview, per-namespace, per-deployment. SLO dashboards with error budget burn rate.",
+    "explanation": "OpenTelemetry is becoming the standard for instrumentation — it's vendor-neutral and supports metrics, logs, and traces. The Prometheus/Grafana stack is the de facto standard for Kubernetes metrics.",
+    "followUpQuestions": [
+      "How do you implement distributed tracing across microservices in Kubernetes?",
+      "How do you set up alerting for Kubernetes node pressure?"
+    ],
+    "keyConcepts": [
+      "Prometheus",
+      "Grafana",
+      "OpenTelemetry",
+      "Kubernetes Observability"
+    ],
+    "tags": [
+      "SRE",
+      "Kubernetes",
+      "Observability",
+      "Monitoring"
+    ],
+    "realWorldContext": "Spotify runs 1000+ microservices on Kubernetes with Prometheus/Grafana for metrics and Jaeger for distributed tracing."
+  },
+  {
+    "id": "sre-003",
+    "roleId": "platform-sre",
+    "category": "scenario",
+    "difficulty": "expert",
+    "question": "A Kubernetes cluster is experiencing cascading failures. Pods are crash-looping and nodes are under pressure. How do you respond?",
+    "answer": "Triage: 1) kubectl get nodes — check node status, resource pressure. 2) kubectl get pods --all-namespaces — identify crash-looping pods. 3) kubectl describe pod <pod> — check events, resource limits, liveness probe failures. 4) kubectl top nodes/pods — CPU/memory usage. Immediate actions: cordon overloaded nodes (kubectl cordon), drain if necessary. Scale down non-critical deployments to free resources. Check for resource quota violations. Root causes: memory leak causing OOMKill, missing resource limits causing noisy neighbor, liveness probe too aggressive, image pull failures. Fix: add resource limits, fix probe thresholds, scale cluster if capacity issue.",
+    "explanation": "Cascading failures in Kubernetes often start with one pod consuming excessive resources, triggering OOMKill on other pods, causing more restarts. Resource limits on every pod prevent this.",
+    "followUpQuestions": [
+      "How do you implement pod disruption budgets to prevent cascading failures?",
+      "What is the difference between liveness and readiness probes?"
+    ],
+    "keyConcepts": [
+      "Kubernetes",
+      "Cascading Failures",
+      "Resource Limits",
+      "OOMKill"
+    ],
+    "tags": [
+      "SRE",
+      "Kubernetes",
+      "Incident Response"
+    ],
+    "realWorldContext": "Missing resource limits are the #1 cause of Kubernetes cluster instability in production environments."
+  },
+  {
+    "id": "sre-004",
+    "roleId": "platform-sre",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement chaos engineering? What are the key principles?",
+    "answer": "Chaos engineering: deliberately inject failures to discover weaknesses before they cause incidents. Principles (Netflix): 1) Build hypothesis around steady state. 2) Vary real-world events (instance failure, network latency, disk full). 3) Run experiments in production (or staging that mirrors prod). 4) Automate experiments. 5) Minimize blast radius. Tools: Chaos Monkey (random instance termination), Gremlin (managed chaos), AWS Fault Injection Simulator, LitmusChaos (Kubernetes). Start small: kill one pod, inject 100ms latency, then escalate. Game days: scheduled chaos experiments with team on standby. Measure: does system recover automatically? Does monitoring alert correctly?",
+    "explanation": "Chaos engineering is not about breaking things randomly — it's about controlled experiments with hypotheses. The goal is to find weaknesses in a controlled way before customers find them.",
+    "followUpQuestions": [
+      "How do you get organizational buy-in for chaos engineering?",
+      "What is the difference between chaos engineering and load testing?"
+    ],
+    "keyConcepts": [
+      "Chaos Engineering",
+      "Chaos Monkey",
+      "Resilience",
+      "Game Days"
+    ],
+    "tags": [
+      "SRE",
+      "Chaos Engineering",
+      "Reliability"
+    ],
+    "realWorldContext": "Netflix's Chaos Monkey randomly terminates production instances — this forced engineers to build resilient services that survive instance failures."
+  },
+  {
+    "id": "sre-005",
+    "roleId": "platform-sre",
+    "category": "technical",
+    "difficulty": "hard",
+    "question": "How do you implement a GitOps workflow for Kubernetes deployments?",
+    "answer": "GitOps: Git as single source of truth for cluster state. Tools: ArgoCD or Flux. Workflow: 1) Developer pushes code → CI builds image, pushes to registry, updates image tag in Git (Helm values or Kustomize overlay). 2) ArgoCD detects Git change, syncs cluster to desired state. 3) Drift detection: ArgoCD alerts if cluster state diverges from Git. 4) Rollback: revert Git commit, ArgoCD re-syncs. Multi-environment: separate Git branches or directories per environment (dev/staging/prod). Secrets: sealed-secrets or External Secrets Operator (never store plaintext secrets in Git). Progressive delivery: Argo Rollouts for canary/blue-green.",
+    "explanation": "GitOps eliminates kubectl apply from CI/CD — the cluster pulls from Git instead of CI pushing to the cluster. This provides audit trail, peer review, and automatic drift correction.",
+    "followUpQuestions": [
+      "How do you handle secrets in a GitOps workflow?",
+      "What is the difference between push-based and pull-based GitOps?"
+    ],
+    "keyConcepts": [
+      "GitOps",
+      "ArgoCD",
+      "Flux",
+      "Kubernetes",
+      "Continuous Delivery"
+    ],
+    "tags": [
+      "SRE",
+      "GitOps",
+      "Kubernetes",
+      "ArgoCD"
+    ],
+    "realWorldContext": "Weaveworks (creators of Flux) and Intuit (ArgoCD) pioneered GitOps for Kubernetes. It's now the standard deployment model for cloud-native applications."
+  }
+]
