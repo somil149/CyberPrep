@@ -12,6 +12,7 @@ const RoadmapPage = lazy(() => import('@pages/RoadmapPage'))
 const FlashcardsPage = lazy(() => import('@pages/FlashcardsPage'))
 const BookmarksPage = lazy(() => import('@pages/BookmarksPage'))
 const AboutPage = lazy(() => import('@pages/AboutPage'))
+const LandingPage = lazy(() => import('@pages/LandingPage'))
 
 function PageLoader() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/roles" element={<RoleSelectionPage />} />
+          <Route path="/" element={<LandingPage />} />
           <Route element={<AppShell />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/questions" element={<QuestionBankPage />} />
@@ -41,7 +43,7 @@ export default function App() {
             <Route path="/bookmarks" element={<BookmarksPage />} />
             <Route path="/about" element={<AboutPage />} />
           </Route>
-          <Route path="*" element={<Navigate to="/roles" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

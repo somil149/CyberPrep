@@ -25,6 +25,20 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
+      {/* Built by banner */}
+      <a
+        href="/CyberPrep/about"
+        className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-cyber-surface border border-cyber-border hover:border-cyber-purple/40 transition-colors group"
+      >
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyber-blue to-cyber-purple flex items-center justify-center text-xs font-bold text-white flex-shrink-0">SG</div>
+        <div className="flex-1 min-w-0">
+          <span className="text-xs text-cyber-muted">Built by </span>
+          <span className="text-xs font-semibold text-cyber-text group-hover:text-cyber-cyan transition-colors">Somil Goyal</span>
+          <span className="text-xs text-cyber-muted"> · Cybersecurity Architect & Agentic AI Engineer</span>
+        </div>
+        <span className="badge-purple text-[10px] flex-shrink-0">About →</span>
+      </a>
+
       {/* Hero */}
       <div className={`card relative overflow-hidden ${isTier1 ? 'border-cyber-purple/30 tier1-glow' : ''}`}>
         <div className="absolute inset-0 bg-gradient-to-r from-cyber-blue/5 to-cyber-purple/5 pointer-events-none" />
