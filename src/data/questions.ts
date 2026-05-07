@@ -1,0 +1,225 @@
+import type { Question } from '@models/index'
+
+export const QUESTIONS: Question[] = [
+  // ── CYBERSECURITY ────────────────────────────────────────────────────────
+  {
+    id: 'cs-001', roleId: 'cybersecurity', category: 'technical', difficulty: 'hard',
+    question: 'Walk me through how you would perform threat modeling for a microservices-based fintech application using STRIDE.',
+    hints: ['Identify trust boundaries', 'Map data flows', 'Apply STRIDE per component'],
+    sampleAnswer: 'Start by creating a DFD of the system, identify all trust boundaries between services, then systematically apply each STRIDE category to every data flow and process...',
+    tags: ['STRIDE', 'Threat Modeling', 'Microservices'],
+  },
+  {
+    id: 'cs-002', roleId: 'cybersecurity', category: 'technical', difficulty: 'expert',
+    question: 'Design a Zero Trust Architecture for a hybrid cloud environment with 10,000 employees. What are the key pillars and how do you implement them?',
+    hints: ['Never trust, always verify', 'Microsegmentation', 'Identity as perimeter'],
+    tags: ['Zero Trust', 'Cloud Security', 'Architecture'],
+  },
+  {
+    id: 'cs-003', roleId: 'cybersecurity', category: 'scenario', difficulty: 'hard',
+    question: 'You detect anomalous lateral movement in your network at 2 AM. Walk me through your incident response process.',
+    hints: ['Contain first or investigate first?', 'Evidence preservation', 'Stakeholder communication'],
+    tags: ['Incident Response', 'Lateral Movement', 'SOC'],
+  },
+  {
+    id: 'cs-004', roleId: 'cybersecurity', category: 'technical', difficulty: 'medium',
+    question: 'Explain the difference between MITRE ATT&CK and MITRE D3FEND. How do you use them together in a security program?',
+    tags: ['MITRE ATT&CK', 'D3FEND', 'Threat Intelligence'],
+  },
+  {
+    id: 'cs-005', roleId: 'cybersecurity', category: 'behavioral', difficulty: 'medium',
+    question: 'Describe a time you had to communicate a critical security risk to non-technical executives. How did you frame it?',
+    tags: ['Communication', 'Risk Management', 'Leadership'],
+  },
+  {
+    id: 'cs-006', roleId: 'cybersecurity', category: 'system-design', difficulty: 'expert',
+    question: 'Design a Security Operations Center (SOC) for a mid-size enterprise. Cover tooling, processes, team structure, and metrics.',
+    tags: ['SOC', 'SIEM', 'Architecture', 'Operations'],
+  },
+
+  // ── DEVSECOPS ────────────────────────────────────────────────────────────
+  {
+    id: 'dso-001', roleId: 'devsecops', category: 'technical', difficulty: 'hard',
+    question: 'Design a secure CI/CD pipeline that integrates SAST, DAST, SCA, and container scanning. What tools would you use and at which stages?',
+    hints: ['Pre-commit hooks', 'Build stage SAST', 'Deploy stage DAST'],
+    tags: ['SAST', 'DAST', 'SCA', 'CI/CD'],
+  },
+  {
+    id: 'dso-002', roleId: 'devsecops', category: 'technical', difficulty: 'expert',
+    question: 'Explain how you would implement a comprehensive SBOM strategy across a polyglot microservices architecture. How do you handle transitive dependencies?',
+    tags: ['SBOM', 'Supply Chain', 'Dependencies'],
+  },
+  {
+    id: 'dso-003', roleId: 'devsecops', category: 'scenario', difficulty: 'hard',
+    question: 'A critical CVE is published for a library used in 47 of your microservices. Walk me through your response and remediation process.',
+    tags: ['CVE', 'Vulnerability Management', 'Incident Response'],
+  },
+  {
+    id: 'dso-004', roleId: 'devsecops', category: 'technical', difficulty: 'medium',
+    question: 'What is the difference between secrets management and secrets scanning? How do you implement both in a DevSecOps pipeline?',
+    tags: ['Secrets Management', 'Vault', 'Security'],
+  },
+  {
+    id: 'dso-005', roleId: 'devsecops', category: 'system-design', difficulty: 'expert',
+    question: 'Design a policy-as-code framework for enforcing security controls across Kubernetes clusters in a multi-tenant environment.',
+    tags: ['OPA', 'Kubernetes', 'Policy-as-Code', 'Multi-tenant'],
+  },
+
+  // ── AI/ML SECURITY ───────────────────────────────────────────────────────
+  {
+    id: 'ams-001', roleId: 'aiml-security', category: 'technical', difficulty: 'expert',
+    question: 'Explain the OWASP ML Security Top 10. Which vulnerabilities are most critical for production LLM deployments?',
+    tags: ['OWASP', 'ML Security', 'LLM'],
+  },
+  {
+    id: 'ams-002', roleId: 'aiml-security', category: 'technical', difficulty: 'hard',
+    question: 'How would you defend an ML model against adversarial examples? Compare adversarial training, input preprocessing, and certified defenses.',
+    tags: ['Adversarial ML', 'Model Defense', 'Robustness'],
+  },
+  {
+    id: 'ams-003', roleId: 'aiml-security', category: 'scenario', difficulty: 'expert',
+    question: 'You discover your production recommendation model has been poisoned via a data supply chain attack. What is your response and how do you prevent recurrence?',
+    tags: ['Model Poisoning', 'Supply Chain', 'Incident Response'],
+  },
+  {
+    id: 'ams-004', roleId: 'aiml-security', category: 'system-design', difficulty: 'expert',
+    question: 'Design an AI governance framework for a financial institution deploying 20+ ML models in production. Cover risk assessment, monitoring, and compliance.',
+    tags: ['AI Governance', 'MLOps', 'Compliance', 'Risk'],
+  },
+  {
+    id: 'ams-005', roleId: 'aiml-security', category: 'technical', difficulty: 'hard',
+    question: 'What is model inversion and membership inference? How do you protect against privacy attacks on ML models?',
+    tags: ['Privacy', 'Model Inversion', 'Differential Privacy'],
+  },
+
+  // ── AGENTIC AI ───────────────────────────────────────────────────────────
+  {
+    id: 'aai-001', roleId: 'agentic-ai', category: 'system-design', difficulty: 'expert',
+    question: 'Design a multi-agent system for autonomous software development. Cover orchestration, tool use, memory, error recovery, and human-in-the-loop checkpoints.',
+    tags: ['Multi-Agent', 'Orchestration', 'LLM', 'Tool Use'],
+  },
+  {
+    id: 'aai-002', roleId: 'agentic-ai', category: 'technical', difficulty: 'hard',
+    question: 'Compare ReAct, Plan-and-Execute, and Reflexion agent architectures. When would you choose each?',
+    tags: ['ReAct', 'Agent Architectures', 'LLM'],
+  },
+  {
+    id: 'aai-003', roleId: 'agentic-ai', category: 'technical', difficulty: 'hard',
+    question: 'How do you implement long-term memory in an agentic system? Compare episodic memory, semantic memory, and procedural memory approaches.',
+    tags: ['Memory', 'RAG', 'Vector DB', 'Agents'],
+  },
+  {
+    id: 'aai-004', roleId: 'agentic-ai', category: 'system-design', difficulty: 'expert',
+    question: 'Design a production-grade RAG pipeline for a legal document analysis agent. Cover chunking strategy, embedding model selection, retrieval, and reranking.',
+    tags: ['RAG', 'Embeddings', 'Retrieval', 'Production'],
+  },
+  {
+    id: 'aai-005', roleId: 'agentic-ai', category: 'technical', difficulty: 'medium',
+    question: 'What are the key differences between LangChain, LlamaIndex, and AutoGen? When would you use each?',
+    tags: ['LangChain', 'LlamaIndex', 'AutoGen', 'Frameworks'],
+  },
+
+  // ── AGENTIC AI SECURITY ──────────────────────────────────────────────────
+  {
+    id: 'aas-001', roleId: 'agentic-ai-security', category: 'technical', difficulty: 'expert',
+    question: 'Explain prompt injection in agentic systems. How does indirect prompt injection differ from direct, and what are the defense strategies?',
+    hints: ['Tool output injection', 'RAG poisoning', 'Instruction hierarchy'],
+    tags: ['Prompt Injection', 'LLM Security', 'Agents'],
+  },
+  {
+    id: 'aas-002', roleId: 'agentic-ai-security', category: 'system-design', difficulty: 'expert',
+    question: 'Design a comprehensive guardrail system for a customer-facing LLM agent. Cover input validation, output filtering, PII detection, and jailbreak prevention.',
+    tags: ['Guardrails', 'LLM Security', 'PII', 'Jailbreak'],
+  },
+  {
+    id: 'aas-003', roleId: 'agentic-ai-security', category: 'scenario', difficulty: 'hard',
+    question: 'Your production LLM agent is being used to exfiltrate data via indirect prompt injection through web search results. How do you detect and mitigate this?',
+    tags: ['Prompt Injection', 'Data Exfiltration', 'Incident Response'],
+  },
+  {
+    id: 'aas-004', roleId: 'agentic-ai-security', category: 'technical', difficulty: 'hard',
+    question: 'What is the OWASP LLM Top 10? Walk through the top 3 risks and their mitigations in an agentic context.',
+    tags: ['OWASP LLM', 'Security', 'Best Practices'],
+  },
+
+  // ── CLOUD ARCHITECT ──────────────────────────────────────────────────────
+  {
+    id: 'ca-001', roleId: 'cloud-architect', category: 'system-design', difficulty: 'hard',
+    question: 'Design a multi-region active-active architecture on AWS for a fintech application with 99.99% SLA.',
+    tags: ['AWS', 'Multi-Region', 'High Availability'],
+  },
+  {
+    id: 'ca-002', roleId: 'cloud-architect', category: 'technical', difficulty: 'medium',
+    question: 'Compare AWS SQS, SNS, EventBridge, and Kinesis. When would you use each for event-driven architectures?',
+    tags: ['AWS', 'Event-Driven', 'Messaging'],
+  },
+
+  // ── FULL-STACK ───────────────────────────────────────────────────────────
+  {
+    id: 'fs-001', roleId: 'fullstack', category: 'system-design', difficulty: 'hard',
+    question: 'Design a real-time collaborative document editing system like Google Docs. Cover conflict resolution, sync, and scalability.',
+    tags: ['Real-time', 'CRDT', 'WebSockets', 'Scalability'],
+  },
+  {
+    id: 'fs-002', roleId: 'fullstack', category: 'technical', difficulty: 'medium',
+    question: 'Explain the differences between REST, GraphQL, and tRPC. When would you choose each for a new project?',
+    tags: ['REST', 'GraphQL', 'tRPC', 'API Design'],
+  },
+
+  // ── BACKEND ──────────────────────────────────────────────────────────────
+  {
+    id: 'be-001', roleId: 'backend', category: 'system-design', difficulty: 'hard',
+    question: 'Design a rate limiting system that works across a distributed microservices architecture.',
+    tags: ['Rate Limiting', 'Distributed Systems', 'Redis'],
+  },
+
+  // ── FRONTEND ─────────────────────────────────────────────────────────────
+  {
+    id: 'fe-001', roleId: 'frontend', category: 'technical', difficulty: 'medium',
+    question: 'Explain React\'s reconciliation algorithm and how the virtual DOM diffing works. What are the performance implications?',
+    tags: ['React', 'Performance', 'Virtual DOM'],
+  },
+
+  // ── DATA ENGINEER ────────────────────────────────────────────────────────
+  {
+    id: 'de-001', roleId: 'data-engineer', category: 'system-design', difficulty: 'hard',
+    question: 'Design a real-time data pipeline that processes 1M events/second with exactly-once semantics.',
+    tags: ['Kafka', 'Flink', 'Exactly-Once', 'Streaming'],
+  },
+
+  // ── ML ENGINEER ──────────────────────────────────────────────────────────
+  {
+    id: 'mle-001', roleId: 'ml-engineer', category: 'system-design', difficulty: 'hard',
+    question: 'Design an ML feature store for a recommendation system serving 100M users. Cover online/offline stores, freshness, and consistency.',
+    tags: ['Feature Store', 'MLOps', 'Recommendation'],
+  },
+
+  // ── PLATFORM/SRE ─────────────────────────────────────────────────────────
+  {
+    id: 'sre-001', roleId: 'platform-sre', category: 'technical', difficulty: 'hard',
+    question: 'How do you define and implement SLOs, SLIs, and error budgets for a payment processing service?',
+    tags: ['SLO', 'SLI', 'Error Budget', 'Reliability'],
+  },
+
+  // ── ENGINEERING MANAGER ──────────────────────────────────────────────────
+  {
+    id: 'em-001', roleId: 'engineering-manager', category: 'behavioral', difficulty: 'medium',
+    question: 'How do you handle a high-performing engineer who is consistently missing deadlines due to scope creep they are creating themselves?',
+    tags: ['Performance', 'Leadership', 'Coaching'],
+  },
+
+  // ── SOLUTION ARCHITECT ───────────────────────────────────────────────────
+  {
+    id: 'sa-001', roleId: 'solution-architect', category: 'system-design', difficulty: 'hard',
+    question: 'A legacy monolith needs to be migrated to microservices without downtime. Design the migration strategy.',
+    tags: ['Migration', 'Strangler Fig', 'Microservices'],
+  },
+]
+
+export function getQuestionsByRole(roleId: string): Question[] {
+  return QUESTIONS.filter((q) => q.roleId === roleId)
+}
+
+export function getQuestionById(id: string): Question | undefined {
+  return QUESTIONS.find((q) => q.id === id)
+}

@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply border-cyber-border; }
+  html { color-scheme: dark; }
+  body {
+    @apply bg-cyber-bg text-cyber-text font-sans antialiased;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg stroke='%231e2d4a' stroke-width='0.5'%3E%3Cpath d='M0 0h40v40H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  ::-webkit-scrollbar { @apply w-1.5; }
+  ::-webkit-scrollbar-track { @apply bg-cyber-bg; }
+  ::-webkit-scrollbar-thumb { @apply bg-cyber-border rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-cyber-blue/50; }
+}
+
+@layer components {
+  .card {
+    @apply bg-cyber-card border border-cyber-border rounded-xl p-4 backdrop-blur-sm;
+  }
+  .card-glass {
+    @apply bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-md;
+  }
+  .btn-primary {
+    @apply bg-gradient-blue text-white font-medium px-4 py-2 rounded-lg
+           hover:opacity-90 active:scale-95 transition-all duration-150
+           shadow-cyber focus:outline-none focus:ring-2 focus:ring-cyber-blue/50;
+  }
+  .btn-secondary {
+    @apply bg-cyber-surface border border-cyber-border text-cyber-text font-medium px-4 py-2 rounded-lg
+           hover:border-cyber-blue/50 hover:bg-cyber-card active:scale-95 transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-cyber-blue/30;
+  }
+  .btn-ghost {
+    @apply text-cyber-muted hover:text-cyber-text hover:bg-cyber-surface px-3 py-2 rounded-lg
+           transition-all duration-150 focus:outline-none;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-blue { @apply badge bg-cyber-blue/10 text-cyber-blue border border-cyber-blue/20; }
+  .badge-purple { @apply badge bg-cyber-purple/10 text-cyber-purple border border-cyber-purple/20; }
+  .badge-green { @apply badge bg-cyber-green/10 text-cyber-green border border-cyber-green/20; }
+  .badge-red { @apply badge bg-cyber-red/10 text-cyber-red border border-cyber-red/20; }
+  .badge-yellow { @apply badge bg-cyber-yellow/10 text-cyber-yellow border border-cyber-yellow/20; }
+  .input {
+    @apply bg-cyber-surface border border-cyber-border rounded-lg px-3 py-2 text-cyber-text
+           placeholder:text-cyber-muted focus:outline-none focus:border-cyber-blue/60
+           focus:ring-1 focus:ring-cyber-blue/30 transition-colors w-full;
+  }
+  .section-title {
+    @apply text-lg font-semibold text-cyber-text tracking-tight;
+  }
+  .neon-text {
+    @apply text-cyber-cyan;
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+  }
+  .tier1-glow {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+  }
+}
+
+@layer utilities {
+  .gradient-blue { background: linear-gradient(135deg, #0ea5e9, #06b6d4); }
+  .gradient-purple { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+  .gradient-green { background: linear-gradient(135deg, #10b981, #06b6d4); }
+  .text-gradient-blue {
+    background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-purple {
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
