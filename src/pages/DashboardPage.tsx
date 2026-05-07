@@ -4,6 +4,8 @@ import { getRoleById } from '@data/roles'
 import { getDashboardConfig } from '@data/dashboard'
 import type { RoleId } from '@models/index'
 
+import somilPhoto from '@/assets/somil-goyal.jpeg'
+
 export default function DashboardPage() {
   const { selectedRole, bookmarks } = useAppStore()
   const navigate = useNavigate()
@@ -30,7 +32,9 @@ export default function DashboardPage() {
         href="/CyberPrep/about"
         className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-cyber-surface border border-cyber-border hover:border-cyber-purple/40 transition-colors group"
       >
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyber-blue to-cyber-purple flex items-center justify-center text-xs font-bold text-white flex-shrink-0">SG</div>
+        <div className="w-8 h-8 rounded-lg overflow-hidden ring-1 ring-cyber-purple/40 flex-shrink-0">
+          <img src={somilPhoto} alt="Somil Goyal" className="w-full h-full object-cover" />
+        </div>
         <div className="flex-1 min-w-0">
           <span className="text-xs text-cyber-muted">Built by </span>
           <span className="text-xs font-semibold text-cyber-text group-hover:text-cyber-cyan transition-colors">Somil Goyal</span>

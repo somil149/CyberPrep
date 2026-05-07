@@ -1,3 +1,5 @@
+import somilPhoto from '@/assets/somil-goyal.jpeg'
+
 export default function AboutPage() {
   const links = [
     { label: 'GitHub', href: 'https://github.com/somil149', icon: '🐙' },
@@ -25,8 +27,8 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-cyber-purple/5 to-cyber-blue/5 pointer-events-none" />
         <div className="relative flex items-center gap-5 flex-wrap">
           {/* Avatar */}
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyber-blue to-cyber-purple flex items-center justify-center text-3xl font-bold text-white flex-shrink-0 shadow-glow-purple">
-            SG
+          <div className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-cyber-purple/50 flex-shrink-0 shadow-glow-purple">
+            <img src={somilPhoto} alt="Somil Goyal" className="w-full h-full object-cover" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">

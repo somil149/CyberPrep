@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import somilPhoto from '@/assets/somil-goyal.jpeg'
 
 export default function LandingPage() {
   const navigate = useNavigate()
@@ -44,8 +45,8 @@ export default function LandingPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 group"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyber-blue to-cyber-purple flex items-center justify-center text-sm font-bold text-white group-hover:shadow-glow-purple transition-all">
-              SG
+            <div className="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-cyber-purple/50 group-hover:ring-cyber-cyan/60 transition-all flex-shrink-0">
+              <img src={somilPhoto} alt="Somil Goyal" className="w-full h-full object-cover" />
             </div>
             <div className="text-left">
               <div className="text-sm font-semibold text-cyber-text group-hover:text-cyber-cyan transition-colors">Somil Goyal</div>
