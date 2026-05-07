@@ -59,8 +59,8 @@ export default function RoleSelectionPage() {
         </div>
         <h1 className="text-3xl font-bold text-gradient-blue mb-2">Choose Your Career Track</h1>
         <p className="text-cyber-muted text-sm max-w-lg mx-auto">
-          Select your target role to unlock a personalized preparation experience with curated questions,
-          mock interviews, and specialized tools.
+          Select your target role to unlock a personalized career acceleration experience with curated challenges,
+          Skills Assessments, and specialized tools.
         </p>
       </div>
 

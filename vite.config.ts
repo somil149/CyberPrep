@@ -13,7 +13,7 @@ export default defineConfig({
       manifest: {
         name: 'CyberPrep Nexus',
         short_name: 'CyberPrep',
-        description: 'AI-Powered Offline-First Professional Interview & Career Acceleration Platform',
+        description: 'AI-Powered Offline-First Career Acceleration Program for Cybersecurity, DevSecOps, and Agentic AI professionals',
         theme_color: '#0a0f1e',
         background_color: '#0a0f1e',
         display: 'standalone',

@@ -7,9 +7,9 @@ export interface DashboardConfig {
 }
 
 const BASE_MODULES = [
-  { title: 'Question Bank', description: 'Browse curated interview questions', to: '/questions', icon: '❓' },
-  { title: 'Mock Interview', description: 'Timed AI-coached interview session', to: '/interview', icon: '🎙️' },
-  { title: 'Learning Roadmap', description: 'Structured preparation path', to: '/roadmap', icon: '🗺️' },
+  { title: 'Knowledge Arsenal', description: 'Browse curated knowledge challenges', to: '/questions', icon: '❓' },
+  { title: 'Skills Assessment', description: 'AI-coached timed skills assessment', to: '/interview', icon: '🎙️' },
+  { title: 'Learning Roadmap', description: 'Structured career acceleration path', to: '/roadmap', icon: '🗺️' },
   { title: 'Flashcards', description: 'Quick concept reinforcement', to: '/flashcards', icon: '⚡' },
 ]
 
@@ -40,7 +40,7 @@ export function getDashboardConfig(roleId: RoleId): DashboardConfig {
   const tier1Mods = TIER1_MODULES[roleId] ?? []
   return {
     quickActions: [
-      { label: 'Start Mock Interview', to: '/interview', icon: '🎙️', variant: 'primary' },
+      { label: 'Start Skills Assessment', to: '/interview', icon: '🎙️', variant: 'primary' },
       { label: 'Browse Questions', to: '/questions', icon: '❓', variant: 'secondary' },
       { label: 'View Roadmap', to: '/roadmap', icon: '🗺️', variant: 'secondary' },
     ],

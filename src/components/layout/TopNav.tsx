@@ -3,8 +3,8 @@ import { useAppStore } from '@stores/appStore'
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
-  '/questions': 'Question Bank',
-  '/interview': 'Mock Interview',
+  '/questions': 'Knowledge Arsenal',
+  '/interview': 'Skills Assessment',
   '/threat-model': 'Threat Modeler',
   '/agentic-studio': 'Agentic AI Studio',
   '/roadmap': 'Learning Roadmap',

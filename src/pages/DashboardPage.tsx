@@ -100,7 +100,7 @@ export default function DashboardPage() {
 
       {/* Modules */}
       <div>
-        <h2 className="section-title mb-3">Preparation Modules</h2>
+        <h2 className="section-title mb-3">Career Modules</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {config.featuredModules.map((mod) => (
             <Link

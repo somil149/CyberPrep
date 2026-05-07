@@ -147,7 +147,7 @@ export default function QuestionBankPage() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="section-title">{role.icon} {role.title} — Question Bank</h1>
+          <h1 className="section-title">{role.icon} {role.title} — Knowledge Arsenal</h1>
           <p className="text-xs text-cyber-muted mt-0.5">{all.length} questions · {filtered.length} shown</p>
         </div>
       </div>

@@ -4,8 +4,8 @@ import { getRoleById } from '@data/roles'
 
 const NAV = [
   { to: '/dashboard', icon: '⬡', label: 'Dashboard' },
-  { to: '/questions', icon: '❓', label: 'Question Bank' },
-  { to: '/interview', icon: '🎙️', label: 'Mock Interview' },
+  { to: '/questions', icon: '❓', label: 'Knowledge Arsenal' },
+  { to: '/interview', icon: '🎙️', label: 'Skills Assessment' },
   { to: '/threat-model', icon: '🛡️', label: 'Threat Modeler', tier1: true },
   { to: '/agentic-studio', icon: '🧠', label: 'Agentic Studio', tier1: true },
   { to: '/roadmap', icon: '🗺️', label: 'Roadmap' },

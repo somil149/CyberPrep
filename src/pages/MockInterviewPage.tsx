@@ -55,7 +55,7 @@ export default function MockInterviewPage() {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
         <span className="text-4xl">🎙️</span>
-        <p className="text-cyber-muted text-sm">Select a role to start a mock interview.</p>
+        <p className="text-cyber-muted text-sm">Select a role to start a Skills Assessment.</p>
       </div>
     )
   }
@@ -102,7 +102,7 @@ export default function MockInterviewPage() {
       <div className="max-w-2xl mx-auto animate-fade-in space-y-6">
         <div className="text-center">
           <div className="text-4xl mb-3">🎙️</div>
-          <h1 className="text-2xl font-bold text-gradient-blue">Mock Interview</h1>
+          <h1 className="text-2xl font-bold text-gradient-blue">Skills Assessment</h1>
           <p className="text-cyber-muted text-sm mt-1">{role.icon} {role.title}</p>
         </div>
 
@@ -146,7 +146,7 @@ export default function MockInterviewPage() {
           </div>
 
           <button onClick={handleStart} className="btn-primary w-full py-3 text-base">
-            🚀 Start Interview
+            🚀 Start Assessment
           </button>
         </div>
       </div>
@@ -222,7 +222,7 @@ export default function MockInterviewPage() {
 
           <div className="flex gap-3">
             <button onClick={handleNext} className="btn-primary flex-1">
-              {currentIdx + 1 < activeSession.questions.length ? 'Next Question →' : 'Finish Interview ✓'}
+              {currentIdx + 1 < activeSession.questions.length ? 'Next Question →' : 'Finish Assessment ✓'}
             </button>
             <button onClick={handleFinish} className="btn-secondary text-xs px-3">
               End Early
@@ -244,7 +244,7 @@ export default function MockInterviewPage() {
       <div className="max-w-2xl mx-auto animate-fade-in space-y-5">
         <div className="text-center">
           <div className="text-5xl mb-3">{avg >= 80 ? '🏆' : avg >= 60 ? '👍' : '💪'}</div>
-          <h1 className="text-2xl font-bold text-gradient-blue">Interview Complete</h1>
+          <h1 className="text-2xl font-bold text-gradient-blue">Assessment Complete</h1>
           <p className="text-cyber-muted text-sm mt-1">
             {new Date(last.startedAt).toLocaleTimeString()} · {last.questions.length} questions
           </p>
@@ -273,7 +273,7 @@ export default function MockInterviewPage() {
         </div>
 
         <button onClick={() => setPhase('setup')} className="btn-primary w-full">
-          🔄 Start New Interview
+          🔄 Start New Assessment
         </button>
       </div>
     )

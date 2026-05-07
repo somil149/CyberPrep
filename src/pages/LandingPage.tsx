@@ -17,7 +17,7 @@ export default function LandingPage() {
           </div>
           <div>
             <h1 className="text-4xl font-bold text-gradient-blue">CyberPrep Nexus</h1>
-            <p className="text-cyber-cyan text-sm mt-1">AI-Powered Offline-First Interview & Career Acceleration Platform</p>
+            <p className="text-cyber-cyan text-sm mt-1">AI-Powered Offline-First Career Acceleration Program</p>
           </div>
         </div>
 
@@ -33,7 +33,7 @@ export default function LandingPage() {
           onClick={() => navigate('/roles')}
           className="btn-primary text-base px-8 py-3 shadow-cyber-lg"
         >
-          🚀 Start Preparing
+          🚀 Launch Your Career Track
         </button>
 
         {/* Built by — prominent */}

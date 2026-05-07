@@ -19,7 +19,7 @@ export default function BookmarksPage() {
       <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
         <span className="text-4xl">🔖</span>
         <h2 className="text-lg font-semibold text-cyber-text">No Bookmarks Yet</h2>
-        <p className="text-cyber-muted text-sm">Bookmark questions from the Question Bank to save them here.</p>
+        <p className="text-cyber-muted text-sm">Bookmark questions from the Knowledge Arsenal to save them here.</p>
       </div>
     )
   }

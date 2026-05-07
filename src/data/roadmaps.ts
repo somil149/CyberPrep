@@ -55,7 +55,7 @@ const ROADMAPS: Record<string, RoadmapItem[]> = {
 const DEFAULT_ROADMAP = (roleId: string): RoadmapItem[] => [
   { id: `${roleId}-r1`, roleId: roleId as RoleId, order: 1, title: 'Core Fundamentals', description: 'Master the foundational concepts for this role', resources: [] },
   { id: `${roleId}-r2`, roleId: roleId as RoleId, order: 2, title: 'Technical Deep Dive', description: 'Advanced technical skills and system design', resources: [] },
-  { id: `${roleId}-r3`, roleId: roleId as RoleId, order: 3, title: 'Interview Preparation', description: 'Practice questions, mock interviews, and behavioral prep', resources: [] },
+  { id: `${roleId}-r3`, roleId: roleId as RoleId, order: 3, title: 'Career Acceleration', description: 'Practice questions, Skills Assessments, and behavioral prep', resources: [] },
 ]
 
 export function getRoadmap(roleId: string): RoadmapItem[] {

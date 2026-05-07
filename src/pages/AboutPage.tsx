@@ -86,10 +86,10 @@ export default function AboutPage() {
       <div className="card border-cyber-cyan/20 bg-cyber-cyan/5">
         <h2 className="section-title flex items-center gap-2 mb-3">🚀 Why CyberPrep Nexus?</h2>
         <p className="text-sm text-cyber-muted leading-relaxed">
-          The best cybersecurity and AI roles demand deep, specialized knowledge — and most interview prep platforms
+          The best cybersecurity and AI roles demand deep, specialized knowledge — and most career platforms
           treat security as an afterthought. I built CyberPrep Nexus to create the platform I wished existed:
           offline-first, role-adaptive, with real enterprise-grade content for Cybersecurity, DevSecOps, Agentic AI,
-          and AI Security roles. No login. No cloud dependency. Just focused preparation.
+          and AI Security roles. No login. No cloud dependency. Just focused career acceleration.
         </p>
       </div>
 
